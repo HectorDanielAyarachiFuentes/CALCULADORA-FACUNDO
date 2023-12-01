@@ -178,16 +178,52 @@ a:nth-child(2)>.botonenlace{background-color: #66FF66;}
 	-webkit-transition:top 0.5s;
 }
 
-#teclado button{
+#teclado button {
 	float: left;
 	height: 20%;
 	box-sizing: border-box;
 	text-align: center;
 	padding-top: 2%;
-	cursor:pointer;
+	cursor: pointer;
 	font-family: 'jellyregular';
-	color:#000;
-}
+	color: #000;
+	transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  #teclado button {
+	transition: background-color 0.3s, color 0.3s; /* Agrega una transición suave */
+  }
+  
+  #teclado button:hover {
+	background-color: #6666FF; /* Cambia el color de fondo al pasar el mouse */
+	color: #fff; /* Cambia el color del texto al pasar el mouse */
+	animation: arcoiris 2s linear infinite; /* Agrega una animación de arcoíris */
+  }
+  
+  @keyframes arcoiris {
+	0% {
+	  background-color: #ff0000; /* Rojo */
+	}
+	16.666% {
+	  background-color: #ff8000; /* Naranja */
+	}
+	33.333% {
+	  background-color: #ffff00; /* Amarillo */
+	}
+	50% {
+	  background-color: #80ff00; /* Verde lima */
+	}
+	66.666% {
+	  background-color: #00ff80; /* Verde cian */
+	}
+	83.333% {
+	  background-color: #0080ff; /* Azul cielo */
+	}
+	100% {
+	  background-color: #ff00ff; /* Violeta */
+	}
+  }
+  
 #teclado button:disabled{background-color: #333}
 
 #tpan{width: 40%;background-color: #6666FF;border:2px solid #000;font-size: 0.5em}
