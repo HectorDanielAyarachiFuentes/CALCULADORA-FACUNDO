@@ -1,0 +1,62 @@
+<!doctype html>
+
+<head>
+
+	<meta http-equiv="Expires" content="0">
+ 	<meta http-equiv="Last-Modified" content="0">
+ 	<meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+ 	<meta http-equiv="Pragma" content="no-cache">
+
+	<meta charset="UTF-8">
+	<meta name="description" content="Calculadora escolar que resuelve los algoritmos de las operaciones más frecuentes.">
+	<meta name="keywords" content="calculadora, escolar, algoritmos, cálculo, manual">
+	<meta name="author" content="HECTOR">
+	<meta meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=no">
+	<title>CALCULADORA ALICIA</title>
+	<link rel="stylesheet" href="estilos.css">
+</head>
+<body onload="alCargar()" onresize="alCargar()">
+	
+	<div id="contenedor">
+		<header>RAMONCITO <span>RA</span></header>
+		<div id="display"></div>
+		<div id="dondetodosucede">
+			<div id="teclado">
+				<button id="tpan" onclick="bajarteclado()">Ver<br>Pantalla</button>
+				<button id="tcal" onclick="calcular()" disabled>=</button>
+				<button id="t7" onclick="escribir('7',false)">7</button>
+				<button id="t8" onclick="escribir('8',false)">8</button>
+				<button id="t9" onclick="escribir('9',false)">9</button>
+				<button id="tmas" onclick="escribir('+',false)" disabled>+</button>
+				<button id="tmen" onclick="escribir('-',false)" disabled>-</button>
+				<button id="t4" onclick="escribir('4',false)">4</button>
+				<button id="t5" onclick="escribir('5',false)">5</button>
+				<button id="t6" onclick="escribir('6',false)">6</button>
+				<button id="tpor" onclick="escribir('x',false)" disabled>x</button>
+				<button id="tdiv" onclick="escribir('index.html',false)" disabled>/</button>
+				<button id="t1" onclick="escribir('1',false)">1</button>
+				<button id="t2" onclick="escribir('2',false)">2</button>
+				<button id="t3" onclick="escribir('3',false)">3</button>
+				<button id="tpri" onclick="escribir('primos',false)" disabled>|</button>
+				<button id="trai" onclick="escribir('raiz',false)" disabled>rc</button>
+				<button id="t0" onclick="escribir('0',false)">0</button>
+				<button id="tcom"  onclick="escribir(',',false)" disabled>,</button>
+				<button id="tc" onclick="escribir('c',false)">C</button>
+				<button id="tdel" onclick="escribir('del',false)">&#60;</button>
+			</div>
+			<div id="salida"></div>
+			<div id="divvolver">
+				<div id="volver" onclick="subirteclado()">J</div>
+				<div id="botexp" onclick="divideExpandida(true)">DIV EXPAND.</div>
+				<div id="botnor" onclick="divideExpandida(false)">DIV NORMAL</div>
+			</div>	
+		</div>
+		<div id="publiabajo">
+			
+		
+	
+			<script src="js01.js"></script>
+
+</body>
+
+</html>
