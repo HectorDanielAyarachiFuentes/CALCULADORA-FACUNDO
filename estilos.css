@@ -86,7 +86,7 @@ header {
 header h1 {
     /* --- MEJORA CLAVE: Tipografía más profesional y moderna --- */
     font-family: "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
-    font-size: 3.5rem; /* Un poco más grande y audaz */
+    font-size: 1.5rem; /* Un poco más grande y audaz */
     font-weight: bold;
     line-height: 1;
     letter-spacing: 2px; /* Añade aire entre las letras */
