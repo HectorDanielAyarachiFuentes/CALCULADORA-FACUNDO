@@ -327,3 +327,41 @@ header span {
         font-size: inherit !important; /* Heredan el tamaño de #salida */
     }
 }
+
+/* --- Estilos del Header (Revisión Final para coincidir con la imagen) --- */
+header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-family: 'jellyregular', sans-serif;
+    font-size: 3.2rem; /* Tamaño grande y audaz */
+    font-weight: normal; /* La fuente ya es suficientemente gruesa */
+    line-height: 0.9;  /* Comprime las líneas para un look más compacto */
+    color: var(--color-title-1); /* Color rojo para el texto principal */
+    margin: 0;
+    padding: 0;
+    text-transform: uppercase; /* Asegura que todo esté en mayúsculas */
+}
+
+header h1 span {
+    color: var(--color-title-2); /* Color verde para "FACUNDO" */
+}
+
+header .subtitle {
+    font-family: 'kurzetstypekurzetstype', sans-serif;
+    font-size: 0.9rem;
+    color: var(--color-title-1); /* El texto del subtítulo también es rojizo */
+    margin-top: 15px; /* Espacio entre el título y el subtítulo */
+}
+
+header .subtitle a {
+    color: var(--btn-special-bg); /* Usamos el azul de tus botones especiales */
+    text-decoration: underline;
+    font-weight: bold; /* Hacemos el nombre más notorio */
+}
+
+header .subtitle a:hover {
+    color: var(--color-title-2); /* Al pasar el ratón, cambia al color verde del título */
+}

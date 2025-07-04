@@ -28,7 +28,6 @@ let divext = false; // Estado para división expandida
 // --- FUNCIONES DE INICIO Y MANEJO DE LA CALCULADORA ---
 
 function alCargar() {
-    header.innerHTML = "<p>LA CALCULADORA DE <span>FACUNDO</span></p><p id='ptwitter' style='font-family:kurzetstypekurzetstype;font-Size:0.3em;'><a id='atwitter' href='' target='_blank'>FACUNDO KILLER</a></p>";
     document.getElementById("tpan").innerHTML = "Ver<br>Pantalla";
     document.getElementById("trai").innerHTML = "RC";
 
@@ -37,9 +36,7 @@ function alCargar() {
     // Aplicar tamaños dinámicos basados en el ancho 'w'
     contenedor.style.width = `${w}px`;
     contenedor.style.paddingTop = `${(w * 1.56) * 0.04}px`;
-    header.style.fontSize = `${0.15 * w}px`;
-    document.getElementById("ptwitter").style.height = `${w * 0.05}px`;
-    document.getElementById("atwitter").style.top = `${-w * 0.035}px`;
+    
     display.style.fontSize = `${w * 0.085}px`;
     display.style.height = `${w * 0.11 * 1.11}px`;
     const dondetodosucede = document.getElementById("dondetodosucede");
