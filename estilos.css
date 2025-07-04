@@ -72,9 +72,8 @@ button {
     position: relative;
     opacity: 0;
     transition: opacity 1s;
-    /* --- MEJORA CLAVE: Tamaño Fijo y Predecible para Escritorio --- */
-    width: 100%;       /* Ocupa el espacio disponible */
-    max-width: 480px;  /* Pero nunca más de 480px, ideal para escritorio */
+    width: 100%;
+    max-width: 480px;
 }
 
 /* --- Header Mejorado para Escritorio --- */
@@ -84,15 +83,14 @@ header {
 }
 
 header h1 {
-    /* --- MEJORA CLAVE: Tipografía más profesional y moderna --- */
     font-family: "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
-    font-size: 1.5rem; /* Un poco más grande y audaz */
+    font-size: 1.5rem;
     font-weight: bold;
     line-height: 1;
-    letter-spacing: 2px; /* Añade aire entre las letras */
+    letter-spacing: 2px;
     color: var(--color-title-1);
     text-transform: uppercase;
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); /* Sombra sutil para darle profundidad */
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 header h1 span {
@@ -103,7 +101,7 @@ header .subtitle {
     font-size: 0.8rem;
     color: var(--color-title-1);
     margin-top: 15px;
-    opacity: 0.8; /* Ligeramente más sutil */
+    opacity: 0.8;
 }
 
 header .subtitle a {
@@ -180,7 +178,7 @@ header .subtitle a:hover {
 }
 #teclado button:not(:disabled):hover {
     animation: arcoiris 2s linear infinite;
-    transform: scale(1.05); /* Efecto de zoom al pasar el ratón */
+    transform: scale(1.05);
 }
 
 #teclado button:disabled {
@@ -269,10 +267,15 @@ header .subtitle a:hover {
         width: 100% !important;
         max-width: none !important;
     }
+    
+    /* --- ¡AQUÍ ESTÁ LA SOLUCIÓN! --- */
+    /* Esto asegura que el contenedor del teclado también ocupe el 100% del ancho */
+    #dondetodosucede {
+        width: 100% !important;
+    }
 
-    /* Fuentes relativas a la pantalla para perfecta adaptabilidad */
     header h1 {
-        font-size: 12vw !important; /* Más grande en móvil */
+        font-size: 12vw !important;
         letter-spacing: 1px !important;
     }
     header .subtitle {
@@ -309,25 +312,21 @@ header .subtitle a:hover {
     }
 }
 
-
 /* =========================================================== */
 /* --- Media Query para Móviles MUY PEQUEÑOS (ej. 320px) --- */
 /* =========================================================== */
 @media (max-width: 400px) {
 
-    /* 1. Reducimos el padding general para ganar espacio valioso */
     body {
         padding: 8px;
     }
 
-    /* 2. Compactamos el header aún más */
     header {
         margin-bottom: 15px;
     }
 
     header h1 {
-        font-size: 10vw !important; /* Reducimos el título para que no se desborde */
-        line-height: 1; /* Mantenemos las líneas juntas */
+        font-size: 10vw !important;
     }
 
     header .subtitle {
@@ -335,29 +334,25 @@ header .subtitle a:hover {
         margin-top: 10px;
     }
 
-    /* 3. Ajustamos el display para que no ocupe tanto */
     #display {
-        font-size: 9.5vw !important; /* Un poco más pequeño */
+        font-size: 9.5vw !important;
         padding: 12px;
         min-height: 50px;
     }
 
-    /* 4. Hacemos los botones del teclado un poco más pequeños */
     #teclado button {
         font-size: 5.5vw;
     }
 
-    /* 5. Ajustamos los botones de la pantalla de salida, que son largos */
     #volver {
         font-size: 6vw !important;
     }
 
     #botexp, #botnor {
         font-size: 3.2vw !important;
-        padding: 7px; /* Menos padding para que no se choquen */
+        padding: 7px;
     }
 
-    /* 6. Hacemos el texto de error más pequeño */
     .perror {
         font-size: 4vw !important;
     }
