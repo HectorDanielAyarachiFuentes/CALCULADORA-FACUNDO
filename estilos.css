@@ -266,3 +266,64 @@ header span {
  min-height:536px;
 }
 
+/* --- Media Query para Dispositivos Móviles --- */
+@media (max-width: 600px) {
+    
+    /* 1. Hacemos que el cuerpo no tenga tanto padding para aprovechar el espacio */
+    body {
+        padding: 10px;
+    }
+
+    /* 2. Anulamos el tamaño calculado por JS y hacemos que el contenedor ocupe el ancho disponible */
+    #contenedor {
+        width: 100% !important; /* Anula el style="width: ...px" del JS */
+        min-height: 0 !important; /* Anula el min-height: 536px; que es muy alto para un móvil */
+        padding-top: 15px !important;
+    }
+
+    /* 3. Ajustamos el tamaño de las fuentes para que sean legibles y proporcionales al ancho */
+    header {
+        font-size: 8vw !important; /* vw = viewport width. Se adapta al ancho de la pantalla */
+        margin-bottom: 10px;
+    }
+    #ptwitter {
+        font-size: 0.5em !important;
+    }
+
+    #display {
+        font-size: 10vw !important;
+        min-height: 55px;
+        padding: 10px;
+    }
+    
+    #teclado button {
+        font-size: 5vw; /* No necesita !important porque no se define en JS */
+    }
+    
+    /* 4. Ajustamos los botones de navegación de la pantalla de salida */
+    #volver {
+        font-size: 7vw !important;
+    }
+    #botexp, #botnor {
+        font-size: 3.5vw !important;
+        padding: 8px;
+    }
+
+    /* 5. Ajustamos el texto de error para que no sea tan grande */
+    .perror {
+        font-size: 1rem !important; /* Un tamaño fijo y legible */
+        padding-top: 25%;
+    }
+
+    /* 6. MUY IMPORTANTE: Ajustamos el tamaño de la fuente en la pantalla de algoritmos */
+    /* El JS calcula un tamaño de fuente muy grande. Aquí lo normalizamos. */
+    #salida {
+        font-size: 5vw !important; /* Base para los algoritmos */
+    }
+
+    /* Los números individuales (cajas) también se ven afectados por el JS.
+       Esta regla asegura que no se desborden. */
+    .caja, .caja2, .caja3, .caja4 {
+        font-size: inherit !important; /* Heredan el tamaño de #salida */
+    }
+}
