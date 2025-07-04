@@ -308,3 +308,57 @@ header .subtitle a:hover {
         font-size: inherit !important;
     }
 }
+
+
+/* =========================================================== */
+/* --- Media Query para Móviles MUY PEQUEÑOS (ej. 320px) --- */
+/* =========================================================== */
+@media (max-width: 400px) {
+
+    /* 1. Reducimos el padding general para ganar espacio valioso */
+    body {
+        padding: 8px;
+    }
+
+    /* 2. Compactamos el header aún más */
+    header {
+        margin-bottom: 15px;
+    }
+
+    header h1 {
+        font-size: 10vw !important; /* Reducimos el título para que no se desborde */
+        line-height: 1; /* Mantenemos las líneas juntas */
+    }
+
+    header .subtitle {
+        font-size: 3.2vw !important;
+        margin-top: 10px;
+    }
+
+    /* 3. Ajustamos el display para que no ocupe tanto */
+    #display {
+        font-size: 9.5vw !important; /* Un poco más pequeño */
+        padding: 12px;
+        min-height: 50px;
+    }
+
+    /* 4. Hacemos los botones del teclado un poco más pequeños */
+    #teclado button {
+        font-size: 5.5vw;
+    }
+
+    /* 5. Ajustamos los botones de la pantalla de salida, que son largos */
+    #volver {
+        font-size: 6vw !important;
+    }
+
+    #botexp, #botnor {
+        font-size: 3.2vw !important;
+        padding: 7px; /* Menos padding para que no se choquen */
+    }
+
+    /* 6. Hacemos el texto de error más pequeño */
+    .perror {
+        font-size: 4vw !important;
+    }
+}
