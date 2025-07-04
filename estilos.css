@@ -1,8 +1,4 @@
-/* ==========================================================================
-   1. CONFIGURACIÓN GENERAL Y VARIABLES
-   ========================================================================== */
-
-/* --- Fuentes Personalizadas (Sin cambios) --- */
+/* --- Fuentes Personalizadas --- */
 @font-face {
     font-family: 'jellyregular';
     src: url('jelly-webfont.woff2') format('woff2'),
@@ -27,59 +23,47 @@
     font-style: normal;
 }
 
-/* --- Tokens de Diseño (Variables CSS) --- */
+/* --- Variables de Color (Estilo "Colorinche" Clásico) --- */
 :root {
-    /* Fuentes */
-    --font-main: 'kurzetstypekurzetstype', sans-serif;
-    --font-title: 'jellyregular', cursive;
-    --font-arrow: 'arrow_7regular', sans-serif;
-
-    /* Colores Base */
     --bg-main: #121212;
     --bg-grid-lines: rgba(200, 200, 200, 0.04);
     --bg-display: #1a1a1a;
-    --bg-keyboard: #000;
-    --text-display: #f0e68c;
+    --bg-keyboard: #000; /* Fondo negro como el original */
 
-    /* Colores de Títulos y UI */
     --color-title-1: #e84d4d;
     --color-title-2: #4de89d;
     --color-subtitle: #888;
+    --color-display-text: #f0e68c;
 
-    /* Colores de Botones (Vibrantes) */
+    /* Colores vibrantes para los botones */
     --btn-num-bg: #FFFF66;
-    --btn-op-bg: #e84d4d; /* Unificado con --color-title-1 */
+    --btn-op-bg: red;
     --btn-special-bg: #6666FF;
     --btn-equal-bg: #66FF66;
-    --btn-text-color: #000;
-    --btn-border-color: #000;
+    --btn-text-color: #000; /* Texto negro para alto contraste */
 
-    /* Estados de Botones */
     --btn-disabled-bg: #333;
     --btn-disabled-text: #666;
 
-    /* Colores para la pantalla de Salida */
     --output-caja-1: #e88d8d;
     --output-caja-2: #8de89d;
     --output-caja-3: #8d8de8;
     --output-caja-4: #e8e88d;
-
-    /* Otros */
-    --border-radius-main: 10px;
-    --transition-speed: 0.25s;
 }
 
 /* --- Reseteo y Estilos Base --- */
-*, *::before, *::after {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: var(--font-main);
+    cursor: default;
+    font-family: 'kurzetstypekurzetstype', sans-serif;
 }
 
-html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+input, button {
+    outline: none;
+    border: none;
+    font-family: inherit;
 }
 
 body {
@@ -91,41 +75,30 @@ body {
     background-image:
         repeating-linear-gradient(90deg, var(--bg-grid-lines) 0 1px, transparent 1px 96px),
         repeating-linear-gradient(0deg, var(--bg-grid-lines) 0 1px, transparent 1px 96px);
-    padding: 24px; /* Margen de seguridad alrededor del contenedor */
-    cursor: default;
+    
+    /* SOLUCIÓN: Añade padding para crear un margen alrededor de la calculadora */
+    padding: 20px;
 }
 
-input, button {
-    outline: none;
-    border: none;
-    font-family: inherit;
-    background: none;
-    color: inherit;
-}
-
-/* ==========================================================================
-   2. LAYOUT PRINCIPAL
-   ========================================================================== */
+/* --- Contenedor Principal y Header (Sin cambios, ya estaba bien) --- */
 #contenedor {
     position: relative;
     opacity: 0;
-    animation: fadeIn 1s forwards;
-    width: 100%;
-    max-width: 450px; /* Ancho máximo para mantener la proporción */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
+    transition: opacity 1s;
+    width: 90vmin;
+    max-width: 450px;
 }
 
 header {
+    margin-bottom: 20px;
     color: var(--color-title-1);
-    font-family: var(--font-title);
+    font-family: 'jellyregular';
     text-align: center;
     line-height: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
 }
 
 header span {
@@ -133,14 +106,28 @@ header span {
 }
 
 #ptwitter {
-    font-family: var(--font-main);
-    font-size: 0.5em;
+    font-family: 'kurzetstypekurzetstype' !important;
+    font-size: 0.5em !important;
     color: var(--color-subtitle);
-    margin-top: 8px;
 }
 #ptwitter a {
     color: inherit;
     text-decoration: none;
+}
+
+/* --- Display y Contenedor de Salida/Teclado --- */
+#display {
+    background-color: var(--bg-display);
+    color: var(--color-display-text);
+    text-align: right;
+    width: 100%;
+    padding: 15px;
+    font-size: 2rem;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    min-height: 60px;
+    word-wrap: break-word;
 }
 
 #dondetodosucede {
@@ -149,45 +136,25 @@ header span {
     width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    border-radius: var(--border-radius-main);
+    border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* ==========================================================================
-   3. COMPONENTES (Display, Teclado, Botones)
-   ========================================================================== */
-
-/* --- Display --- */
-#display {
-    background-color: var(--bg-display);
-    color: var(--text-display);
-    text-align: right;
-    width: 100%;
-    padding: 20px;
-    font-size: clamp(1.5rem, 8vw, 2.5rem); /* Tipografía fluida */
-    border-radius: var(--border-radius-main);
-    min-height: 80px;
-    overflow-wrap: break-word; /* Evita que el texto largo rompa el layout */
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-/* --- Teclado (Grid Layout) --- */
+/* --- Layout del Teclado con CSS Grid --- */
 #teclado {
     position: absolute;
-    inset: 0; /* Sustituto moderno de top/right/bottom/left: 0 */
+    top: 0;
     width: 100%;
     height: 100%;
     transition: top 0.5s ease-in-out;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    gap: 2px;
+    gap: 2px; /* Espacio mínimo como en el diseño original */
 }
 
-/* --- Botones (Estilo Base y Modificadores) --- */
-.btn {
+/* --- Estilos de los Botones --- */
+#teclado button {
     font-size: 1.2rem;
     color: var(--btn-text-color);
     cursor: pointer;
@@ -195,101 +162,91 @@ header span {
     justify-content: center;
     align-items: center;
     padding: 0;
-    border: 2px solid var(--btn-border-color);
-    font-family: var(--font-title);
-    transition: transform var(--transition-speed) ease,
-                box-shadow var(--transition-speed) ease;
-    will-change: transform; /* Optimización para la animación */
+    border: 2px solid #000; /* Borde negro como en el original */
+    font-family: 'jellyregular';
 }
 
-/* Estado presionado para feedback táctil */
-.btn:active:not(:disabled) {
-    transform: scale(0.96);
-    transition-duration: 0.1s;
+/* Efecto de hover arcoíris restaurado */
+@keyframes arcoiris {
+    0%   { background-color: #ff0000; }
+    16%  { background-color: #ff8000; }
+    33%  { background-color: #ffff00; }
+    50%  { background-color: #00ff00; }
+    66%  { background-color: #00ffff; }
+    83%  { background-color: #0000ff; }
+    100% { background-color: #ff00ff; }
+}
+#teclado button:hover {
+    animation: arcoiris 2s linear infinite;
 }
 
-/* Estado deshabilitado */
-.btn:disabled {
-    background-color: var(--btn-disabled-bg) !important; /* !important necesario para sobreescribir inline styles o modificadores */
+#teclado button:disabled {
+    background-color: var(--btn-disabled-bg) !important;
     color: var(--btn-disabled-text);
     cursor: not-allowed;
-    animation: none !important; /* Desactiva cualquier animación */
+    animation: none; /* Desactiva la animación para botones deshabilitados */
 }
 
-/* Hover Mejorado: Flujo de Arcoíris */
-.btn:hover:not(:disabled) {
-    animation: rainbow-flow 4s linear infinite;
-    background-image: linear-gradient(to right,
-        #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff,
-        #ff0000); /* Se repite el primer color para un bucle perfecto */
-    background-size: 400% 100%;
-}
+/* Asignando colores y tamaños de los botones con Grid */
+#tpan { grid-column: span 2; background-color: var(--btn-special-bg); font-size: 0.8em; }
+#tcal { grid-column: span 3; background-color: var(--btn-equal-bg); }
 
-@keyframes rainbow-flow {
-    0%   { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
-}
+#t1, #t2, #t3, #t4, #t5, #t6, #t7, #t8, #t9, #t0, #tcom { background-color: var(--btn-num-bg); }
+#t0 { grid-column: span 2; }
 
+/* Operadores por defecto son rojos */
+#tmas, #tmen, #tpor, #tdiv, #tc, #tdel { background-color: var(--btn-op-bg); }
 
-/* Modificadores de Color */
-.btn--num { background-color: var(--btn-num-bg); }
-.btn--operator { background-color: var(--btn-op-bg); }
-.btn--special { background-color: var(--btn-special-bg); font-size: 0.8em; }
-.btn--equal { background-color: var(--btn-equal-bg); }
+/* Excepción: estos dos operadores son verdes como en tu diseño original */
+#tpri, #trai { background-color: var(--btn-equal-bg); }
 
-/* Modificadores de Posición en Grid */
-.btn--span-2 { grid-column: span 2; }
-.btn--span-3 { grid-column: span 3; }
-
-
-/* ==========================================================================
-   4. PANTALLA SECUNDARIA (SALIDA Y NAVEGACIÓN)
-   ========================================================================== */
-
-.slide-screen {
+/* --- Pantalla de Salida y Botones de Volver (sin cambios funcionales) --- */
+#salida {
     position: absolute;
+    top: -100%;
+    background-color: #111;
     width: 100%;
     height: 100%;
-    top: -100%;
     transition: top 0.5s ease-in-out;
-}
-
-#salida {
-    background-color: #111;
-    padding: 20px;
-    overflow-y: auto;
+    padding: 15px;
+    overflow: auto; /* Permite scroll si el algoritmo es muy largo */
 }
 
 #divvolver {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: top 0.5s ease-in-out;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     padding: 10px;
-    pointer-events: none; /* El contenedor no captura clicks, solo sus hijos */
+    pointer-events: none;
 }
 
-.nav-btn {
+#volver, #botexp, #botnor {
     pointer-events: all;
     color: rgba(255, 255, 255, 0.4);
     background-color: rgba(255, 255, 255, 0.05);
-    padding: 10px 15px;
+    padding: 10px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color var(--transition-speed);
+    transition: background-color 0.2s;
 }
-.nav-btn:hover {
+#volver:hover, #botexp:hover, #botnor:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
 }
 
-#volver { font-family: var(--font-arrow); font-size: 1.5rem; }
-#botexp, #botnor { font-family: var(--font-title); display: none; }
+#volver { font-family: 'arrow_7regular'; font-size: 1.5rem; }
+#botexp, #botnor { font-family: 'jellyregular'; display: none; }
 
-/* Estilos para el contenido de la salida */
+/* Estilos para los números dentro de la salida */
 .caja, .caja2, .caja3, .caja4 {
-    position: absolute;
-    text-align: center;
-    font-family: var(--font-main);
+	position: absolute;
+	text-align: center;
+	font-family: 'kurzetstypekurzetstype';
 }
 .caja  { color: var(--output-caja-1); }
 .caja2 { color: var(--output-caja-2); }
@@ -302,3 +259,10 @@ header span {
     text-align: center;
     padding-top: 20%;
 }
+
+/* Contenedor */
+#contenedor{
+ padding-top:0px !important;
+ min-height:536px;
+}
+
