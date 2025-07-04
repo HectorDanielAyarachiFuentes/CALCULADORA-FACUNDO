@@ -1,69 +1,51 @@
 /* --- Fuentes Personalizadas --- */
 @font-face {
     font-family: 'jellyregular';
-    src: url('jelly-webfont.woff2') format('woff2'),
-         url('jelly-webfont.woff') format('woff');
+    src: url('jelly-webfont.woff2') format('woff2'), url('jelly-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
-
 @font-face {
     font-family: 'kurzetstypekurzetstype';
-    src: url('kurzetstype_v1.4-webfont.woff2') format('woff2'),
-         url('kurzetstype_v1.4-webfont.woff') format('woff');
+    src: url('kurzetstype_v1.4-webfont.woff2') format('woff2'), url('kurzetstype_v1.4-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
-
 @font-face {
     font-family: 'arrow_7regular';
-    src: url('arrow_7-webfont.woff2') format('woff2'),
-         url('arrow_7-webfont.woff') format('woff');
+    src: url('arrow_7-webfont.woff2') format('woff2'), url('arrow_7-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
-/* --- Variables de Color (Estilo "Colorinche" Clásico) --- */
+/* --- Variables Globales de Color --- */
 :root {
     --bg-main: #121212;
     --bg-grid-lines: rgba(200, 200, 200, 0.04);
     --bg-display: #1a1a1a;
-    --bg-keyboard: #000; /* Fondo negro como el original */
-
+    --bg-keyboard: #000;
     --color-title-1: #e84d4d;
     --color-title-2: #4de89d;
-    --color-subtitle: #888;
     --color-display-text: #f0e68c;
-
-    /* Colores vibrantes para los botones */
     --btn-num-bg: #FFFF66;
     --btn-op-bg: red;
     --btn-special-bg: #6666FF;
     --btn-equal-bg: #66FF66;
-    --btn-text-color: #000; /* Texto negro para alto contraste */
-
+    --btn-text-color: #000;
     --btn-disabled-bg: #333;
     --btn-disabled-text: #666;
-
     --output-caja-1: #e88d8d;
     --output-caja-2: #8de89d;
     --output-caja-3: #8d8de8;
     --output-caja-4: #e8e88d;
 }
 
-/* --- Reseteo y Estilos Base --- */
+/* --- Estilos Base y Reseteo --- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     cursor: default;
-    font-family: 'kurzetstypekurzetstype', sans-serif;
-}
-
-input, button {
-    outline: none;
-    border: none;
-    font-family: inherit;
 }
 
 body {
@@ -75,58 +57,79 @@ body {
     background-image:
         repeating-linear-gradient(90deg, var(--bg-grid-lines) 0 1px, transparent 1px 96px),
         repeating-linear-gradient(0deg, var(--bg-grid-lines) 0 1px, transparent 1px 96px);
-    
-    /* SOLUCIÓN: Añade padding para crear un margen alrededor de la calculadora */
     padding: 20px;
+    font-family: 'kurzetstypekurzetstype', sans-serif;
 }
 
-/* --- Contenedor Principal y Header (Sin cambios, ya estaba bien) --- */
+button {
+    outline: none;
+    border: none;
+    font-family: inherit;
+}
+
+/* --- Estructura Principal de la Calculadora --- */
 #contenedor {
     position: relative;
     opacity: 0;
     transition: opacity 1s;
-    width: 90vmin;
-    max-width: 450px;
+    /* --- MEJORA CLAVE: Tamaño Fijo y Predecible para Escritorio --- */
+    width: 100%;       /* Ocupa el espacio disponible */
+    max-width: 480px;  /* Pero nunca más de 480px, ideal para escritorio */
 }
 
+/* --- Header Mejorado para Escritorio --- */
 header {
-    margin-bottom: 20px;
-    color: var(--color-title-1);
-    font-family: 'jellyregular';
+    margin-bottom: 25px;
     text-align: center;
-    line-height: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
 }
 
-header span {
+header h1 {
+    /* --- MEJORA CLAVE: Tipografía más profesional y moderna --- */
+    font-family: "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 3.5rem; /* Un poco más grande y audaz */
+    font-weight: bold;
+    line-height: 1;
+    letter-spacing: 2px; /* Añade aire entre las letras */
+    color: var(--color-title-1);
+    text-transform: uppercase;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); /* Sombra sutil para darle profundidad */
+}
+
+header h1 span {
     color: var(--color-title-2);
 }
 
-#ptwitter {
-    font-family: 'kurzetstypekurzetstype' !important;
-    font-size: 0.5em !important;
-    color: var(--color-subtitle);
-}
-#ptwitter a {
-    color: inherit;
-    text-decoration: none;
+header .subtitle {
+    font-size: 0.8rem;
+    color: var(--color-title-1);
+    margin-top: 15px;
+    opacity: 0.8; /* Ligeramente más sutil */
 }
 
-/* --- Display y Contenedor de Salida/Teclado --- */
+header .subtitle a {
+    color: var(--btn-special-bg);
+    text-decoration: underline;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+header .subtitle a:hover {
+    color: var(--color-title-2);
+}
+
+
+/* --- Display y Contenedor del Teclado --- */
 #display {
     background-color: var(--bg-display);
     color: var(--color-display-text);
     text-align: right;
     width: 100%;
-    padding: 15px;
-    font-size: 2rem;
+    padding: 20px;
+    font-size: 2.2rem;
     overflow: hidden;
     border-radius: 10px;
     margin-bottom: 15px;
-    min-height: 60px;
+    min-height: 65px;
     word-wrap: break-word;
 }
 
@@ -140,7 +143,7 @@ header span {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Layout del Teclado con CSS Grid --- */
+/* --- Teclado y Botones --- */
 #teclado {
     position: absolute;
     top: 0;
@@ -150,23 +153,22 @@ header span {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
-    gap: 2px; /* Espacio mínimo como en el diseño original */
+    gap: 2px;
 }
 
-/* --- Estilos de los Botones --- */
 #teclado button {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     color: var(--btn-text-color);
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 0;
-    border: 2px solid #000; /* Borde negro como en el original */
+    border: 2px solid #000;
     font-family: 'jellyregular';
+    transition: transform 0.1s ease;
 }
 
-/* Efecto de hover arcoíris restaurado */
 @keyframes arcoiris {
     0%   { background-color: #ff0000; }
     16%  { background-color: #ff8000; }
@@ -176,31 +178,26 @@ header span {
     83%  { background-color: #0000ff; }
     100% { background-color: #ff00ff; }
 }
-#teclado button:hover {
+#teclado button:not(:disabled):hover {
     animation: arcoiris 2s linear infinite;
+    transform: scale(1.05); /* Efecto de zoom al pasar el ratón */
 }
 
 #teclado button:disabled {
     background-color: var(--btn-disabled-bg) !important;
     color: var(--btn-disabled-text);
     cursor: not-allowed;
-    animation: none; /* Desactiva la animación para botones deshabilitados */
 }
 
-/* Asignando colores y tamaños de los botones con Grid */
+/* Colores y tamaños específicos de botones */
 #tpan { grid-column: span 2; background-color: var(--btn-special-bg); font-size: 0.8em; }
 #tcal { grid-column: span 3; background-color: var(--btn-equal-bg); }
-
-#t1, #t2, #t3, #t4, #t5, #t6, #t7, #t8, #t9, #t0, #tcom { background-color: var(--btn-num-bg); }
 #t0 { grid-column: span 2; }
-
-/* Operadores por defecto son rojos */
+#t1, #t2, #t3, #t4, #t5, #t6, #t7, #t8, #t9, #t0, #tcom { background-color: var(--btn-num-bg); }
 #tmas, #tmen, #tpor, #tdiv, #tc, #tdel { background-color: var(--btn-op-bg); }
-
-/* Excepción: estos dos operadores son verdes como en tu diseño original */
 #tpri, #trai { background-color: var(--btn-equal-bg); }
 
-/* --- Pantalla de Salida y Botones de Volver (sin cambios funcionales) --- */
+/* --- Pantalla de Salida (Algoritmos) --- */
 #salida {
     position: absolute;
     top: -100%;
@@ -209,7 +206,7 @@ header span {
     height: 100%;
     transition: top 0.5s ease-in-out;
     padding: 15px;
-    overflow: auto; /* Permite scroll si el algoritmo es muy largo */
+    overflow: auto;
 }
 
 #divvolver {
@@ -225,7 +222,6 @@ header span {
     padding: 10px;
     pointer-events: none;
 }
-
 #volver, #botexp, #botnor {
     pointer-events: all;
     color: rgba(255, 255, 255, 0.4);
@@ -233,16 +229,16 @@ header span {
     padding: 10px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 #volver:hover, #botexp:hover, #botnor:hover {
     background-color: rgba(255, 255, 255, 0.1);
+    color: white;
 }
-
 #volver { font-family: 'arrow_7regular'; font-size: 1.5rem; }
 #botexp, #botnor { font-family: 'jellyregular'; display: none; }
 
-/* Estilos para los números dentro de la salida */
+/* Estilos para los números dentro de los algoritmos */
 .caja, .caja2, .caja3, .caja4 {
 	position: absolute;
 	text-align: center;
@@ -260,47 +256,38 @@ header span {
     padding-top: 20%;
 }
 
-/* Contenedor */
-#contenedor{
- padding-top:0px !important;
- min-height:536px;
-}
-
-/* --- Media Query para Dispositivos Móviles --- */
+/* ======================================================= */
+/* --- Media Query para Dispositivos Móviles (Revisada) --- */
+/* ======================================================= */
 @media (max-width: 600px) {
     
-    /* 1. Hacemos que el cuerpo no tenga tanto padding para aprovechar el espacio */
     body {
         padding: 10px;
     }
 
-    /* 2. Anulamos el tamaño calculado por JS y hacemos que el contenedor ocupe el ancho disponible */
     #contenedor {
-        width: 100% !important; /* Anula el style="width: ...px" del JS */
-        min-height: 0 !important; /* Anula el min-height: 536px; que es muy alto para un móvil */
-        padding-top: 15px !important;
+        width: 100% !important;
+        max-width: none !important;
     }
 
-    /* 3. Ajustamos el tamaño de las fuentes para que sean legibles y proporcionales al ancho */
-    header {
-        font-size: 8vw !important; /* vw = viewport width. Se adapta al ancho de la pantalla */
-        margin-bottom: 10px;
+    /* Fuentes relativas a la pantalla para perfecta adaptabilidad */
+    header h1 {
+        font-size: 12vw !important; /* Más grande en móvil */
+        letter-spacing: 1px !important;
     }
-    #ptwitter {
-        font-size: 0.5em !important;
+    header .subtitle {
+        font-size: 3.5vw !important;
     }
 
     #display {
         font-size: 10vw !important;
-        min-height: 55px;
-        padding: 10px;
+        padding: 15px;
     }
     
     #teclado button {
-        font-size: 5vw; /* No necesita !important porque no se define en JS */
+        font-size: 6vw;
     }
     
-    /* 4. Ajustamos los botones de navegación de la pantalla de salida */
     #volver {
         font-size: 7vw !important;
     }
@@ -309,59 +296,15 @@ header span {
         padding: 8px;
     }
 
-    /* 5. Ajustamos el texto de error para que no sea tan grande */
     .perror {
-        font-size: 1rem !important; /* Un tamaño fijo y legible */
+        font-size: 4.5vw !important;
         padding-top: 25%;
     }
 
-    /* 6. MUY IMPORTANTE: Ajustamos el tamaño de la fuente en la pantalla de algoritmos */
-    /* El JS calcula un tamaño de fuente muy grande. Aquí lo normalizamos. */
     #salida {
-        font-size: 5vw !important; /* Base para los algoritmos */
+        font-size: 5vw !important;
     }
-
-    /* Los números individuales (cajas) también se ven afectados por el JS.
-       Esta regla asegura que no se desborden. */
     .caja, .caja2, .caja3, .caja4 {
-        font-size: inherit !important; /* Heredan el tamaño de #salida */
+        font-size: inherit !important;
     }
-}
-
-/* --- Estilos del Header (Revisión Final para coincidir con la imagen) --- */
-header {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-header h1 {
-    font-family: 'jellyregular', sans-serif;
-    font-size: 3.2rem; /* Tamaño grande y audaz */
-    font-weight: normal; /* La fuente ya es suficientemente gruesa */
-    line-height: 0.9;  /* Comprime las líneas para un look más compacto */
-    color: var(--color-title-1); /* Color rojo para el texto principal */
-    margin: 0;
-    padding: 0;
-    text-transform: uppercase; /* Asegura que todo esté en mayúsculas */
-}
-
-header h1 span {
-    color: var(--color-title-2); /* Color verde para "FACUNDO" */
-}
-
-header .subtitle {
-    font-family: 'kurzetstypekurzetstype', sans-serif;
-    font-size: 0.9rem;
-    color: var(--color-title-1); /* El texto del subtítulo también es rojizo */
-    margin-top: 15px; /* Espacio entre el título y el subtítulo */
-}
-
-header .subtitle a {
-    color: var(--btn-special-bg); /* Usamos el azul de tus botones especiales */
-    text-decoration: underline;
-    font-weight: bold; /* Hacemos el nombre más notorio */
-}
-
-header .subtitle a:hover {
-    color: var(--color-title-2); /* Al pasar el ratón, cambia al color verde del título */
 }
