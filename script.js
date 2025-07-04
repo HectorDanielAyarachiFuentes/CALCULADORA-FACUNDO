@@ -13,13 +13,13 @@ const botNor = document.getElementById("botnor");
 const header = document.getElementsByTagName("header")[0];
 
 const errorMessages = {
-    division1: "<p class='perror'>El dividendo es cero, por lo tanto el resultado es cero.</p>",
-    division2: "<p class='perror'>El divisor es cero, no existe solución.</p>",
-    division3: "<p class='perror'>El dividendo y el divisor son cero, no existe solución.</p>",
-    multiplicacion1: "<p class='perror'>Multiplicar por cero da como resultado cero.</p>",
-    multiplicacion2: "<p class='perror'>El resultado es demasiado grande.</p>",
-    raiz1: "<p class='perror'>La raíz cuadrada de cero es cero.</p>",
-    dFactorial1: "<p class='perror'>No se puede descomponer el cero.</p>",
+    division1: "<p class='error'>El dividendo es cero, por lo tanto el resultado es cero.</p>",
+    division2: "<p class='error'>El divisor es cero, no existe solución.</p>",
+    division3: "<p class='error'>El dividendo y el divisor son cero, no existe solución.</p>",
+    multiplicacion1: "<p class='error'>Multiplicar por cero da como resultado cero.</p>",
+    multiplicacion2: "<p class='error'>El resultado es demasiado grande.</p>",
+    raiz1: "<p class='error'>La raíz cuadrada de cero es cero.</p>",
+    dFactorial1: "<p class='error'>No se puede descomponer el cero.</p>",
 };
 
 let w; // Ancho base para cálculos de tamaño
@@ -39,9 +39,9 @@ function alCargar() {
     
     display.style.fontSize = `${w * 0.085}px`;
     display.style.height = `${w * 0.11 * 1.11}px`;
-    const dondetodosucede = document.getElementById("dondetodosucede");
-    dondetodosucede.style.width = `${0.95 * w}px`;
-    dondetodosucede.style.height = `${0.95 * w}px`;
+    const cuerpoteclado = document.getElementById("cuerpoteclado");
+    cuerpoteclado.style.width = `${0.95 * w}px`;
+    cuerpoteclado.style.height = `${0.95 * w}px`;
     teclado.style.fontSize = `${0.1 * w}px`;
     const volver = document.getElementById("volver");
     volver.style.fontSize = `${0.15 * w}px`;
@@ -359,11 +359,11 @@ function divide(numerosAR) {
     // de cómo se construyen los arrays `numAr`, etc.
     // Por ahora, para que funcione, puedes pegar aquí tu función `divide` original.
     // Si quieres que la refactorice, necesitaré analizarla con más calma.
-    salida.innerHTML = "<p class='perror'>La visualización de la división<br>aún no ha sido implementada<br>en esta versión refactorizada.</p>";
+    salida.innerHTML = "<p class='error'>La visualización de la división<br>aún no ha sido implementada<br>en esta versión refactorizada.</p>";
 }
 
 function divideExt(numerosAR) {
-    salida.innerHTML = "<p class='perror'>La visualización de la división<br>aún no ha sido implementada<br>en esta versión refactorizada.</p>";
+    salida.innerHTML = "<p class='error'>La visualización de la división<br>aún no ha sido implementada<br>en esta versión refactorizada.</p>";
 }
 
 function desFacPri() {
@@ -427,7 +427,7 @@ function desFacPri() {
 }
 
 function raizCuadrada() {
-    salida.innerHTML = "<p class='perror'>La visualización de la raíz cuadrada<br>aún no ha sido implementada<br>en esta versión refactorizada.</p>";
+    salida.innerHTML = "<p class='error'>La visualización de la raíz cuadrada<br>aún no ha sido implementada<br>en esta versión refactorizada.</p>";
 }
 
 

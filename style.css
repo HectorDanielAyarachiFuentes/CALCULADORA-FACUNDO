@@ -131,7 +131,7 @@ header .subtitle a:hover {
     word-wrap: break-word;
 }
 
-#dondetodosucede {
+#cuerpoteclado {
     position: relative;
     background-color: var(--bg-keyboard);
     width: 100%;
@@ -247,7 +247,7 @@ header .subtitle a:hover {
 .caja3 { color: var(--output-caja-3); }
 .caja4 { color: var(--output-caja-4); }
 
-.perror {
+.error {
     color: var(--output-caja-1);
     font-size: 1.2rem;
     text-align: center;
@@ -270,7 +270,7 @@ header .subtitle a:hover {
     
     /* --- ¡AQUÍ ESTÁ LA SOLUCIÓN! --- */
     /* Esto asegura que el contenedor del teclado también ocupe el 100% del ancho */
-    #dondetodosucede {
+    #cuerpoteclado {
         width: 100% !important;
     }
 
@@ -299,7 +299,7 @@ header .subtitle a:hover {
         padding: 8px;
     }
 
-    .perror {
+    .error {
         font-size: 4.5vw !important;
         padding-top: 25%;
     }
@@ -353,7 +353,7 @@ header .subtitle a:hover {
         padding: 7px;
     }
 
-    .perror {
+    .error {
         font-size: 4vw !important;
     }
 }
