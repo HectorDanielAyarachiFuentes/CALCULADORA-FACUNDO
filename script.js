@@ -630,15 +630,188 @@ function raizCuadrada() {
     bajarteclado();
 }
 
-// ===================================
-// --- MÓDulos DE HISTORIAL ---
-// ===================================
-const HistoryManager = (function() { const e = "calculatorHistory"; let t = []; function n() { try { const o = localStorage.getItem(e); t = o ? JSON.parse(o) : [] } catch (o) { console.error("Error al cargar historial:", o); t = [] } } function o() { try { localStorage.setItem(e, JSON.stringify(t)) } catch (o) { console.error("Error al guardar historial:", o) } } function r(e, n) { window.dispatchEvent(new CustomEvent(e, { detail: n })) } return { init: function() { n() }, add: function(e) { const n = t.findIndex(t => t.input === e.input); -1 < n ? (alert("¡Oye, chamaco! Esa operación ya está en tu historial."), r("history:duplicate", { index: n })) : (t.unshift(e), o(), r("history:updated")) }, getAll: function() { return [...t] }, clear: function() { t = []; o(); r("history:updated") } } })();
-const HistoryPanel = (function() { let e, t, n, o; function r() { const a = HistoryManager.getAll(); t.innerHTML = ""; if (0 === a.length) { t.innerHTML = '<li><span class="history-input">El historial está vacío.</span></li>'; return } a.forEach((a, c) => { const i = document.createElement("li"); i.setAttribute("data-history-index", c); const s = document.createElement("div"); s.innerHTML = a.visualHtml; const d = s.querySelectorAll("[style*='border-top']"); let l = 0 < d.length ? Array.from(d).map(e => e.textContent).join("").trim() : ""; l = l || s.querySelector("p.error")?.textContent || "?"; i.innerHTML = `<span class="history-input">${a.input}</span><span class="history-result-preview">= ${l}</span>`; t.appendChild(i) }) } function a() { e.classList.toggle("open") } function c(c) { const i = c.target.closest("li[data-history-index]"); if (!i) return; const s = i.dataset.historyIndex, d = HistoryManager.getAll()[s]; d && (display.innerHTML = d.input, salida.innerHTML = d.visualHtml, activadoBotones(d.input), bajarteclado(), a()) } function i() { confirm("¿Seguro que quieres borrar todo el historial?") && HistoryManager.clear() } function s(t) { const { index: r } = t.detail; e.classList.contains("open") || a(); const c = list.querySelector(`li[data-history-index="${r}"]`); c && (c.classList.remove("history-item-highlight"), void c.offsetWidth, c.classList.add("history-item-highlight")) } return { init: function() { e = document.getElementById("history-panel"); t = document.getElementById("history-list"); n = document.getElementById("history-toggle-btn"); o = document.getElementById("clear-history-btn"); n.addEventListener("click", a); o.addEventListener("click", i); t.addEventListener("click", c); window.addEventListener("history:updated", r); window.addEventListener("history:duplicate", s); r() } } })();
+// ===================================================================
+// --- MÓDULOS COMPLETOS DE HISTORIAL (CORREGIDOS Y MEJORADOS) ---
+// ===================================================================
+
+/**
+ * HistoryManager: Se encarga de la lógica de datos del historial.
+ * Guarda, carga, añade y borra operaciones del localStorage.
+ */
+const HistoryManager = (function() {
+    const HISTORY_KEY = "calculatorHistory"; // Clave para el localStorage
+    let history = []; // Array interno para guardar el historial
+
+    // Carga el historial desde localStorage al iniciar
+    function loadHistory() {
+        try {
+            const storedHistory = localStorage.getItem(HISTORY_KEY);
+            history = storedHistory ? JSON.parse(storedHistory) : [];
+        } catch (error) {
+            console.error("Error al cargar el historial desde localStorage:", error);
+            history = [];
+        }
+    }
+
+    // Guarda el historial actual en localStorage
+    function saveHistory() {
+        try {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        } catch (error) {
+            console.error("Error al guardar el historial en localStorage:", error);
+        }
+    }
+
+    // Dispara eventos personalizados para notificar a otras partes de la app
+    function dispatchEvent(eventName, detail) {
+        window.dispatchEvent(new CustomEvent(eventName, { detail }));
+    }
+
+    // Métodos públicos del módulo
+    return {
+        init: function() {
+            loadHistory();
+        },
+        add: function(entry) {
+            const existingIndex = history.findIndex(item => item.input === entry.input);
+            
+            if (existingIndex > -1) {
+                alert("¡Oye, chamaco! Esa operación ya está en tu historial.");
+                dispatchEvent("history:duplicate", { index: existingIndex });
+            } else {
+                history.unshift(entry); // Añade el nuevo elemento al principio
+                saveHistory();
+                dispatchEvent("history:updated");
+            }
+        },
+        getAll: function() {
+            return [...history]; // Devuelve una copia para evitar modificaciones externas
+        },
+        clear: function() {
+            history = [];
+            saveHistory();
+            dispatchEvent("history:updated");
+        }
+    };
+})();
 
 
+/**
+ * HistoryPanel: Se encarga de la parte visual del historial.
+ * Dibuja el panel, maneja los clics y responde a los eventos de HistoryManager.
+ */
+const HistoryPanel = (function() {
+    // Variables para los elementos del DOM (más claras que e, t, n, o)
+    let panelElement, listElement, toggleButton, clearButton;
 
+    // Dibuja (renderiza) la lista de operaciones en el panel
+    function renderHistory() {
+        const historyEntries = HistoryManager.getAll();
+        listElement.innerHTML = ""; // Limpia la lista antes de volver a dibujarla
 
+        if (historyEntries.length === 0) {
+            listElement.innerHTML = '<li><span class="history-input">El historial está vacío.</span></li>';
+            return;
+        }
+
+        historyEntries.forEach((entry, index) => {
+            const listItem = document.createElement("li");
+            listItem.setAttribute("data-history-index", index);
+
+            // --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
+            // Creamos un div temporal para procesar el HTML del resultado
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = entry.visualHtml;
+
+            // En lugar de una lógica compleja, simplemente obtenemos TODO el texto visible.
+            // .textContent obtiene "12" de "<p>12</p>", lo cual es perfecto.
+            // .trim() quita espacios sobrantes.
+            // || "?" es el valor por defecto si no hay nada.
+            const resultText = tempDiv.textContent.trim() || "?";
+            // --- FIN DE LA CORRECCIÓN ---
+
+            listItem.innerHTML = `<span class="history-input">${entry.input}</span><span class="history-result-preview">= ${resultText}</span>`;
+            listElement.appendChild(listItem);
+        });
+    }
+
+    // Muestra u oculta el panel del historial
+    function togglePanel() {
+        panelElement.classList.toggle("open");
+    }
+
+    // Se ejecuta cuando el usuario hace clic en un elemento del historial
+    function handleItemClick(event) {
+        const clickedItem = event.target.closest("li[data-history-index]");
+        if (!clickedItem) return;
+
+        const index = clickedItem.dataset.historyIndex;
+        const historyEntry = HistoryManager.getAll()[index];
+
+        if (historyEntry) {
+            // Asumo que tienes elementos con id 'display' y 'salida'
+            display.innerHTML = historyEntry.input;
+            salida.innerHTML = historyEntry.visualHtml;
+            
+            // Llama a otras funciones que puedas necesitar
+            activadoBotones(historyEntry.input);
+            bajarteclado();
+            
+            togglePanel(); // Cierra el panel después de la selección
+        }
+    }
+
+    // Se ejecuta al hacer clic en el botón "Limpiar"
+    function handleClearClick() {
+        if (confirm("¿Seguro que quieres borrar todo el historial?")) {
+            HistoryManager.clear();
+        }
+    }
+
+    // Resalta un elemento cuando se intenta añadir un duplicado
+    function handleDuplicate(event) {
+        const { index } = event.detail;
+        if (!panelElement.classList.contains("open")) {
+            togglePanel();
+        }
+        const itemToHighlight = listElement.querySelector(`li[data-history-index="${index}"]`);
+        if (itemToHighlight) {
+            // Este truco reinicia la animación CSS para que se vea el efecto de nuevo
+            itemToHighlight.classList.remove("history-item-highlight");
+            void itemToHighlight.offsetWidth;
+            itemToHighlight.classList.add("history-item-highlight");
+        }
+    }
+
+    // Métodos públicos del módulo
+    return {
+        init: function() {
+            // Asignación de elementos del DOM a las variables
+            panelElement = document.getElementById("history-panel");
+            listElement = document.getElementById("history-list");
+            toggleButton = document.getElementById("history-toggle-btn");
+            clearButton = document.getElementById("clear-history-btn");
+
+            // Asignación de eventos
+            toggleButton.addEventListener("click", togglePanel);
+            clearButton.addEventListener("click", handleClearClick);
+            listElement.addEventListener("click", handleItemClick);
+
+            // Escucha los eventos personalizados de HistoryManager
+            window.addEventListener("history:updated", renderHistory);
+            window.addEventListener("history:duplicate", handleDuplicate);
+
+            renderHistory(); // Dibuja el historial por primera vez al cargar la página
+        }
+    };
+})();
+
+// No te olvides de llamar a init en tu archivo principal para que todo empiece a funcionar
+// Ejemplo:
+// document.addEventListener('DOMContentLoaded', () => {
+//     HistoryManager.init();
+//     HistoryPanel.init();
+// });
 
 
 
@@ -646,130 +819,57 @@ const HistoryPanel = (function() { let e, t, n, o; function r() { const a = Hist
 
 
 // =======================================================
-// --- REEMPLAZO: FUNCIÓN SIMPLIFICADA PARA RAÍZ CUADRADA ---
+// --- FUNCIÓN DE RAÍZ CUADRADA (CORREGIDA Y SIMPLIFICADA) ---
 // =======================================================
 function raizCuadrada() {
+    // 1. Limpiar siempre la pantalla de resultados antes de empezar
     salida.innerHTML = "";
-    const numeroStr = display.innerHTML;
-    const numero = parseInt(numeroStr, 10);
+    
+    // 2. Obtener la entrada y convertirla a número
+    const entrada = display.innerHTML;
+    const numero = parseInt(entrada, 10);
 
-    // --- Validaciones ---
-    if (isNaN(numero) || numeroStr.includes(',')) {
+    // 3. Validaciones (usando la lógica que ya tenías)
+    if (isNaN(numero) || entrada.includes(',')) {
         salida.innerHTML = "<p class='error'>La raíz cuadrada solo funciona con números enteros.</p>";
         bajarteclado();
-        return;
-    }
-    if (numero < 0) {
-        salida.innerHTML = errorMessages.raiz2; // Ya tienes este mensaje
-        bajarteclado();
-        return;
+        return; // Salir de la función
     }
     if (numero === 0) {
-        salida.innerHTML = errorMessages.raiz1; // Y este también
+        salida.innerHTML = errorMessages.raiz1; // "La raíz cuadrada de cero es cero."
+        // Guardamos el resultado en el historial para consistencia
+        HistoryManager.add({ input: `√(${entrada})`, visualHtml: salida.innerHTML });
         bajarteclado();
-        return;
+        return; // Salir
+    }
+     if (numero < 0) {
+        salida.innerHTML = "<p class='error'>No se puede calcular la raíz de un número negativo.</p>";
+        bajarteclado();
+        return; 
     }
 
-    const raizExacta = Math.sqrt(numero);
-    if (raizExacta % 1 !== 0) {
+    // 4. Calcular el resultado
+    const resultado = Math.sqrt(numero);
+
+    // 5. Validar si la raíz es exacta (entera)
+    if (resultado % 1 !== 0) {
         salida.innerHTML = "<p class='error'>Este número no tiene una raíz cuadrada entera exacta.</p>";
         bajarteclado();
-        return;
+        return; // Salir
     }
 
-    // --- Visualización del algoritmo ---
-    // Clear previous content
-    salida.innerHTML = ''; 
-    // Set up a container for the visual output using flexbox or grid for alignment
-    const container = document.createElement('div');
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column'; // Stack elements vertically
-    container.style.alignItems = 'center'; // Center elements horizontally
-    container.style.fontFamily = 'monospace'; // Use monospace for alignment
-    container.style.fontSize = '2.5em';
-    container.style.color = '#fff';
-    container.style.padding = '10px';
-
-    // Top result (the calculated root)
-    const resultDiv = document.createElement('div');
-    resultDiv.textContent = raizExacta;
-    resultDiv.style.color = '#ffaa00'; // Yellow color for the result
-    container.appendChild(resultDiv);
-
-    // Visual representation of the long division for square root
-    const processDiv = document.createElement('div');
-    processDiv.style.display = 'grid';
-    processDiv.style.gridTemplateColumns = 'auto auto 1fr'; // Root | Square Root Sign | Number
-    processDiv.style.alignItems = 'center'; // Vertically align items
-    processDiv.style.marginTop = '10px';
-
-    // The root (e.g., '9' in your example)
-    const rootNumberSpan = document.createElement('span');
-    rootNumberSpan.textContent = raizExacta;
-    rootNumberSpan.style.color = '#00ff00'; // Green color
-    rootNumberSpan.style.marginRight = '5px';
-    rootNumberSpan.style.gridColumn = '1';
-    rootNumberSpan.style.textAlign = 'right';
-    processDiv.appendChild(rootNumberSpan);
-
-    // The square root symbol
-    const sqrtSymbolSpan = document.createElement('span');
-    sqrtSymbolSpan.innerHTML = '&#8730;'; // Unicode for square root symbol
-    sqrtSymbolSpan.style.color = '#ddd'; // Light gray
-    sqrtSymbolSpan.style.marginRight = '5px';
-    sqrtSymbolSpan.style.gridColumn = '2';
-    processDiv.appendChild(sqrtSymbolSpan);
-
-    // The number under the radical
-    const numberUnderRadicalSpan = document.createElement('span');
-    numberUnderRadicalSpan.textContent = numeroStr;
-    numberUnderRadicalSpan.style.color = '#ffff00'; // Yellow color
-    numberUnderRadicalSpan.style.borderBottom = '2px solid #ddd'; // Underline
-    numberUnderRadicalSpan.style.gridColumn = '3';
-    numberUnderRadicalSpan.style.textAlign = 'left';
-    processDiv.appendChild(numberUnderRadicalSpan);
+    // 6. Crear el HTML de salida (SIMPLE Y LIMPIO)
+    const htmlResultado = `<p>${resultado}</p>`;
     
-    // First subtraction line: -81
-    const subtractLine = document.createElement('div');
-    subtractLine.style.gridColumn = 'span 3'; // Span all columns
-    subtractLine.style.textAlign = 'center';
-    subtractLine.style.marginTop = '10px'; // Space below the top line
-    
-    const subtractValue = document.createElement('span');
-    subtractValue.textContent = '-' + (raizExacta * raizExacta).toString();
-    subtractValue.style.color = '#99aaff'; // Blue-ish color
-    subtractValue.style.textAlign = 'center';
-    subtractValue.style.position = 'relative'; // For fine-tuning position
-    subtractValue.style.left = '10px'; // Adjust this value to align it
-    subtractLine.appendChild(subtractValue);
-    processDiv.appendChild(subtractLine);
+    // 7. Mostrar el resultado en la pantalla de salida
+    salida.innerHTML = htmlResultado;
 
-    // Horizontal line for the subtraction
-    const horizontalLine = document.createElement('div');
-    horizontalLine.style.gridColumn = 'span 3';
-    horizontalLine.style.borderBottom = '2px solid #ddd';
-    horizontalLine.style.width = '70%'; // Adjust width as needed
-    horizontalLine.style.justifySelf = 'center'; // Center the line
-    processDiv.appendChild(horizontalLine);
-    
-    // Remainder: 0
-    const remainderDiv = document.createElement('div');
-    remainderDiv.style.gridColumn = 'span 3';
-    remainderDiv.style.textAlign = 'center';
-    remainderDiv.style.marginTop = '10px';
-    
-    const remainderValue = document.createElement('span');
-    remainderValue.textContent = '0';
-    remainderValue.style.color = '#00ff00'; // Green color for the remainder
-    remainderValue.style.position = 'relative';
-    remainderValue.style.left = '25px'; // Adjust this value to align it
-    remainderDiv.appendChild(remainderValue);
-    processDiv.appendChild(remainderDiv);
+    // 8. Guardar la operación CORRECTA en el historial
+    HistoryManager.add({
+        input: `√(${entrada})`,       // La operación que se hizo
+        visualHtml: htmlResultado  // El resultado visual limpio
+    });
 
-    container.appendChild(processDiv);
-    salida.appendChild(container);
-
-    HistoryManager.add({ input: `√(${numeroStr})`, visualHtml: salida.innerHTML });
+    // 9. Bajar el teclado para mostrar el resultado
     bajarteclado();
 }
-
