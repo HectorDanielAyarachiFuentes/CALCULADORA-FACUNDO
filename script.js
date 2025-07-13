@@ -97,12 +97,12 @@ function activadoBotones(contDisplay) {
     });
 
     const tieneOperadorGeneral = /[\+\-x/]/.test(contDisplay);
-    const puedeAnadirOperadorBasico = !esSoloCero && !tieneOperadorGeneral && !tieneComaAlFinal;
-    ['tmen', 'tpor', 'tdiv', 'trai'].forEach(id => {
-        document.getElementById(id).disabled = !puedeAnadirOperadorBasico || demasiadosCaracteres;
+    const puedeAnadirOperador = !esSoloCero && !tieneOperadorGeneral && !tieneComaAlFinal;
+
+    ['tmas', 'tmen', 'tpor', 'tdiv', 'trai'].forEach(id => {
+        document.getElementById(id).disabled = !puedeAnadirOperador || demasiadosCaracteres;
     });
 
-    document.getElementById("tmas").disabled = esSoloCero || tieneOperadorAlFinal || tieneComaAlFinal || demasiadosCaracteres;
     const puedeAnadirComa = !ultimoNumero.includes(',') && !tieneOperadorAlFinal && !deshabilitarNumeros;
     document.getElementById("tcom").disabled = !puedeAnadirComa;
     
@@ -132,11 +132,71 @@ function calcular() {
     bajarteclado();
 }
 function crearCelda(clase, texto, estilos) { const c=document.createElement("div");c.className=clase;c.innerHTML=texto;Object.assign(c.style,estilos);salida.appendChild(c); }
-function crearFlechaLlevada(left,top,width,height){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("width",width);s.setAttribute("height",height);s.style.position='absolute';s.style.left=`${left}px`;s.style.top=`${top}px`;s.style.overflow='visible';const d=document.createElementNS("http://www.w3.org/2000/svg","defs"),m=document.createElementNS("http://www.w3.org/2000/svg","marker"),i="arrowhead-"+Math.random().toString(36).substring(2,9);m.setAttribute("id",i);m.setAttribute("viewBox","0 0 10 10");m.setAttribute("refX",8);m.setAttribute("refY",5);m.setAttribute("markerWidth",5);m.setAttribute("markerHeight",5);m.setAttribute("orient","auto-start-reverse");const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d","M 0 0 L 10 5 L 0 10 z");p.setAttribute("fill","#ff5555");m.appendChild(p);d.appendChild(m);s.appendChild(d);const h=document.createElementNS("http://www.w3.org/2000/svg","path"),x1=width*.9,y1=height,cx=width*.1,cy=height,x2=width*.2,y2=height*.15;h.setAttribute("d",`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);h.setAttribute("stroke","#ff5555");h.setAttribute("stroke-width",2.5);h.setAttribute("stroke-linecap","round");h.setAttribute("fill","none");h.setAttribute("marker-end",`url(#${i})`);s.appendChild(h);salida.appendChild(s);const l=h.getTotalLength();h.style.strokeDasharray=l;h.style.strokeDashoffset=l;h.style.transition='stroke-dashoffset .8s cubic-bezier(0.68, -0.55, 0.27, 1.55)';requestAnimationFrame(()=>{h.style.strokeDashoffset='0'})}
 
+// --- FUNCIÓN RESTAURADA ---
+// Se vuelve a incluir la función para dibujar las flechas de "llevada".
+function crearFlechaLlevada(left,top,width,height){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("width",width);s.setAttribute("height",height);s.style.position='absolute';s.style.left=`${left}px`;s.style.top=`${top}px`;s.style.overflow='visible';const d=document.createElementNS("http://www.w3.org/2000/svg","defs"),m=document.createElementNS("http://www.w3.org/2000/svg","marker"),i="arrowhead-"+Math.random().toString(36).substring(2,9);m.setAttribute("id",i);m.setAttribute("viewBox","0 0 10 10");m.setAttribute("refX",8);m.setAttribute("refY",5);m.setAttribute("markerWidth",5);m.setAttribute("markerHeight",5);m.setAttribute("orient","auto-start-reverse");const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d","M 0 0 L 10 5 L 0 10 z");p.setAttribute("fill","#ff5555");m.appendChild(p);d.appendChild(m);s.appendChild(d);const h=document.createElementNS("http://www.w3.org/2000/svg","path"),x1=width*.9,y1=height,cx=width*.1,cy=height,x2=width*.2,y2=height*.15;h.setAttribute("d",`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);h.setAttribute("stroke","#ff5555");h.setAttribute("stroke-width",2.5);h.setAttribute("stroke-linecap","round");h.setAttribute("fill","none");h.setAttribute("marker-end",`url(#${i})`);s.appendChild(h);const l=h.getTotalLength();h.style.strokeDasharray=l;h.style.strokeDashoffset=l;h.style.transition='stroke-dashoffset .8s cubic-bezier(0.68, -0.55, 0.27, 1.55)';requestAnimationFrame(()=>{h.style.strokeDashoffset='0'})}
+
+// --- FUNCIÓN RESTAURADA ---
+// Se vuelve a la versión original de la suma, que muestra los detalles de la operación.
 function suma(numerosAR) { let m=0;numerosAR.forEach(n=>m=Math.max(m,n[1]));let s=numerosAR.map(n=>n[0].padEnd(n[0].length+m-n[1],'0')),l=Math.max(...s.map(n=>n.length)),c=s.map(n=>n.padStart(l,'0'));let t=0n;c.forEach(n=>t+=BigInt(n));let r=t.toString(),a=Math.max(r.length,l+1),h=numerosAR.length+3,x=Math.max(h,a),g=(h>a)?(h-a)/2:0,e=0.95*w/x,f=e*multiplicadorTamFuente;let v={},o=0;for(let i=l-1;i>=0;i--){let u=o;c.forEach(n=>{u+=parseInt(n[i])});o=Math.floor(u/10);if(o>0){let d=i-1+(a-l);if(d>=0){v[d]=o.toString();let p=1.5+numerosAR.length-1+0.5,q=.8,z=p*e-q*e,y=e*.7,_=(d+g+.3)*e;crearFlechaLlevada(_,q*e,y,z)}}}let n=s.map(n=>n.padStart(a,' ')),j=r.padStart(a,' ');let b=1.5;for(const d in v){crearCelda("caja",v[d],{left:`${(parseInt(d)+g)*e}px`,top:`.1em`,width:`${e}px`,height:`${e}px`,fontSize:f*.7+'px',color:"red",textAlign:'center'})}n.forEach((p,q)=>{for(let i=0;i<p.length;i++){if(p[i]!==' '){crearCelda("caja",p[i],{left:`${(i+g)*e}px`,top:`${(q+b)*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:'#ffff00'})}}});let k=a-l-1,i=b+n.length-1;crearCelda("caja","+",{left:`${(k+g)*e}px`,top:`${i*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:'#ffff00'});let p=(b+n.length)*e;for(let q=0;q<j.length;q++){crearCelda("caja",j[q],{left:`${(q+g)*e}px`,top:`${p}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',borderTop:"2px #ddd solid",color:'#00ff00'})}}
-function resta(numerosAR) { let m=Math.max(numerosAR[0][1],numerosAR[1][1]),n1=numerosAR[0][0].padEnd(numerosAR[0][0].length+m-numerosAR[0][1],'0'),n2=numerosAR[1][0].padEnd(numerosAR[1][0].length+m-numerosAR[1][1],'0');let s,d,g=false;if(BigInt(n1)>=BigInt(n2)){s=n1;d=n2}else{s=n2;d=n1;g=true}let l=Math.max(s.length,d.length);s=s.padStart(l,'0');d=d.padStart(l,'0');let v={},f=[],o=0;for(let i=l-1;i>=0;i--){let u=parseInt(s[i])-o,j=parseInt(d[i]);o=0;if(u<j){o=1;u+=10;if(i>0)v[i-1]="-1"}f[i]=u-j}let p=f.join('').replace(/^0+/,'')||"0",a=Math.max(s.length,d.length+1,p.length+(g?1:0)),x=s.padStart(a,' '),k=("- "+d).padStart(a,' '),c=(g?"-":"")+p.padStart(a-(g?1:0),' '),z=5,y=Math.max(z,a),e=(z>a)?(z-a)/2:0,t=0.95*w/y,h=t*multiplicadorTamFuente;for(const j in v){crearCelda("caja",v[j],{left:`${(parseInt(j)+e)*t}px`,top:`.25em`,width:`${t}px`,height:`${t}px`,fontSize:h*.7+'px',color:"red",textAlign:'center'})}let q=[x,k,c],r=['#ffff00','#ffff00','#00ff00'];q.forEach((u,i)=>{let b=i<=1?i+1:i+2;for(let j=0;j<u.length;j++){if(u[j]!==' '){crearCelda("caja",u[j],{left:`${(j+e)*t}px`,top:`${b*t}px`,width:`${t}px`,height:`${t}px`,fontSize:h+'px',color:r[i],borderTop:i===2?"2px #ddd solid":"none"})}}})}
-function multiplica(numerosAR){let n1=numerosAR[0][0],n2=numerosAR[1][0];if(n1==="0"||n2==="0"){salida.innerHTML=errorMessages.multiplicacion1;return}let r=(BigInt(n1)*BigInt(n2)).toString();if(r.length>20){salida.innerHTML=errorMessages.multiplicacion2;return}let a=Math.max(n1.length,n2.length+1,r.length),h=n2.length>1?3+n2.length:3,m=Math.max(h,a),g=(m-a)/2,e=0.95*w/m,f=e*multiplicadorTamFuente;for(let i=0;i<n1.length;i++){crearCelda("caja3",n1[i],{left:`${(a-n1.length+i+g)*e}px`,top:"0px",width:`${e}px`,height:`${e}px`,fontSize:f+'px'})}crearCelda("caja","x",{left:`${(a-n2.length-1+g)*e}px`,top:`${e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:"#ddd",borderBottom:"2px #ddd solid"});for(let i=0;i<n2.length;i++){crearCelda("caja3",n2[i],{left:`${(a-n2.length+i+g)*e}px`,top:`${e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',borderBottom:"2px #ddd solid"})}let k=2;if(n2.length>1){for(let i=n2.length-1;i>=0;i--){let p=(BigInt(n1)*BigInt(n2[i])).toString(),c=n2.length-1-i;for(let j=0;j<p.length;j++){crearCelda("caja2",p[j],{left:`${(a-p.length+j-c+g)*e}px`,top:`${k*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px'})}k++}}let p=(n2.length>1?k:2)*e;for(let i=0;i<r.length;i++){crearCelda("caja4",r[i],{left:`${(a-r.length+i+g)*e}px`,top:`${p}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',borderTop:"2px #ddd solid"})}}
+
+// La resta se mantiene simplificada
+function resta(numerosAR) {
+    let m = Math.max(numerosAR[0][1], numerosAR[1][1]);
+    let n1 = numerosAR[0][0].padEnd(numerosAR[0][0].length + m - numerosAR[0][1], '0');
+    let n2 = numerosAR[1][0].padEnd(numerosAR[1][0].length + m - numerosAR[1][1], '0');
+    let r = (BigInt(n1) - BigInt(n2)).toString();
+    const h = 3;
+    let a = Math.max(n1.length, n2.length + 1, r.length);
+    let m_grid = Math.max(h, a);
+    let g = (m_grid - a) / 2;
+    let e = 0.95 * w / m_grid;
+    let f = e * multiplicadorTamFuente;
+
+    for (let i = 0; i < n1.length; i++) {
+        crearCelda("caja3", n1[i], { left: `${(a - n1.length + i + g) * e}px`, top: "0px", width: `${e}px`, height: `${e}px`, fontSize: f + 'px', color: '#ffff00' });
+    }
+    crearCelda("caja", "-", { left: `${(a - n2.length - 1 + g) * e}px`, top: `${e}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', color: "#ffff00" });
+    for (let i = 0; i < n2.length; i++) {
+        crearCelda("caja3", n2[i], { left: `${(a - n2.length + i + g) * e}px`, top: `${e}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', color: '#ffff00' });
+    }
+    let topPosResult = 2 * e;
+    for (let i = 0; i < r.length; i++) {
+        crearCelda("caja4", r[i], { left: `${(a - r.length + i + g) * e}px`, top: `${topPosResult}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', borderTop: "2px #ddd solid", color: '#00ff00' });
+    }
+}
+
+// La multiplicación se mantiene simplificada
+function multiplica(numerosAR) {
+    let n1 = numerosAR[0][0], n2 = numerosAR[1][0];
+    if (n1 === "0" || n2 === "0") {
+        salida.innerHTML = errorMessages.multiplicacion1;
+        return;
+    }
+    let r = (BigInt(n1) * BigInt(n2)).toString();
+    if (r.length > 20) {
+        salida.innerHTML = errorMessages.multiplicacion2;
+        return;
+    }
+    const h = 3;
+    let a = Math.max(n1.length, n2.length + 1, r.length),
+        m = Math.max(h, a),
+        g = (m - a) / 2,
+        e = 0.95 * w / m,
+        f = e * multiplicadorTamFuente;
+    for (let i = 0; i < n1.length; i++) {
+        crearCelda("caja3", n1[i], { left: `${(a - n1.length + i + g) * e}px`, top: "0px", width: `${e}px`, height: `${e}px`, fontSize: f + 'px' });
+    }
+    crearCelda("caja", "x", { left: `${(a - n2.length - 1 + g) * e}px`, top: `${e}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', color: "#ddd"});
+    for (let i = 0; i < n2.length; i++) {
+        crearCelda("caja3", n2[i], { left: `${(a - n2.length + i + g) * e}px`, top: `${e}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px'});
+    }
+    let p = 2 * e;
+    for (let i = 0; i < r.length; i++) {
+        crearCelda("caja4", r[i], { left: `${(a - r.length + i + g) * e}px`, top: `${p}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', borderTop: "2px #ddd solid" });
+    }
+}
 function divide(numerosAR){salida.innerHTML="<p class='error'>Visualización de división no implementada.</p>"}
 function divideExt(numerosAR){salida.innerHTML="<p class='error'>Visualización de división extendida no implementada.</p>"}
 
@@ -154,7 +214,7 @@ function desFacPri() {
 function raizCuadrada() {salida.innerHTML="<p class='error'>Visualización de raíz cuadrada no implementada.</p>"; bajarteclado(); }
 
 // ===================================
-// --- MÓDULOS DE HISTORIAL ---
+// --- MÓDulos DE HISTORIAL ---
 // ===================================
 const HistoryManager=(function(){const e="calculatorHistory";let t=[];function n(){try{const o=localStorage.getItem(e);t=o?JSON.parse(o):[]}catch(o){console.error("Error al cargar historial:",o);t=[]}}function o(){try{localStorage.setItem(e,JSON.stringify(t))}catch(o){console.error("Error al guardar historial:",o)}}function r(e,n){window.dispatchEvent(new CustomEvent(e,{detail:n}))}return{init:function(){n()},add:function(e){const n=t.findIndex(t=>t.input===e.input);-1<n?(alert("¡Oye, chamaco! Esa operación ya está en tu historial."),r("history:duplicate",{index:n})):(t.unshift(e),o(),r("history:updated"))},getAll:function(){return[...t]},clear:function(){t=[];o();r("history:updated")}}})();
 const HistoryPanel=(function(){let e,t,n,o;function r(){const a=HistoryManager.getAll();t.innerHTML="";if(0===a.length){t.innerHTML='<li><span class="history-input">El historial está vacío.</span></li>';return}a.forEach((a,c)=>{const i=document.createElement("li");i.setAttribute("data-history-index",c);const s=document.createElement("div");s.innerHTML=a.visualHtml;const d=s.querySelectorAll("[style*='border-top']");let l=0<d.length?Array.from(d).map(e=>e.textContent).join("").trim():"";l=l||s.querySelector("p.error")?.textContent||"?";i.innerHTML=`<span class="history-input">${a.input}</span><span class="history-result-preview">= ${l}</span>`;t.appendChild(i)})}function a(){e.classList.toggle("open")}function c(c){const i=c.target.closest("li[data-history-index]");if(!i)return;const s=i.dataset.historyIndex,d=HistoryManager.getAll()[s];d&&(display.innerHTML=d.input,salida.innerHTML=d.visualHtml,activadoBotones(d.input),bajarteclado(),a())}function i(){confirm("¿Seguro que quieres borrar todo el historial?")&&HistoryManager.clear()}function s(t){const{index:r}=t.detail;e.classList.contains("open")||a();const c=list.querySelector(`li[data-history-index="${r}"]`);c&&(c.classList.remove("history-item-highlight"),void c.offsetWidth,c.classList.add("history-item-highlight"))}return{init:function(){e=document.getElementById("history-panel");t=document.getElementById("history-list");n=document.getElementById("history-toggle-btn");o=document.getElementById("clear-history-btn");n.addEventListener("click",a);o.addEventListener("click",i);t.addEventListener("click",c);window.addEventListener("history:updated",r);window.addEventListener("history:duplicate",s);r()}}})();
