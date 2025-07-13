@@ -19,15 +19,15 @@ Has llegado al lugar correcto. Si buscas una herramienta que no solo calcula, si
 
 ## 🖼️ Galería de la Grandeza: Las Pruebas Irrefutables
 
-Los nombres de los archivos no mienten. Cada uno captura un momento de gloria de este proyecto, servido directamente desde el repositorio con enlaces de grado militar.
+Cada imagen, un testamento del poderío. Cada título, una declaración de intenciones.
 
-| Nombre del Archivo Secreto (y su significado)         | La Evidencia Gráfica                                                                                                                                           |
+| Muestra de Poder (y su Significado)                  | La Evidencia Gráfica                                                                                                                                           |
 | :------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`Inicio de calculadora.jpeg`**<br>La calma antes de la tormenta numérica. La interfaz de escritorio, esperando tus órdenes con una elegancia imponente. | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Inicio%20de%20calculadora.jpeg?raw=true" alt="Inicio de calculadora" width="250"/>               |
-| **`Version movil.jpeg`**<br>Todo el poder de Facundo Killer, condensado para tu bolsillo. Lista para desatar el caos numérico donde sea que vayas.        | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Version%20movil.jpeg?raw=true" alt="Version movil" width="250"/>                      |
-| **`Haciendo cuentas.jpeg`**<br>La calculadora en plena acción, resolviendo dilemas existenciales como la multiplicación por cero. Poesía matemática.   | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Haciendo%20cuentas.jpeg?raw=true" alt="Haciendo cuentas" width="250"/>                  |
-| **`mas cuentas moviles.jpeg`**<br>Demostrando que no hay suma demasiado larga ni pantalla demasiado pequeña. La victoria de las matemáticas de bolsillo.      | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/mas%20cuentas%20moviles.jpeg?raw=true" alt="mas cuentas moviles" width="250"/>               |
-| **`Para recordarte XD.jpeg`**<br>Un pequeño recordatorio de por qué esto no es una calculadora cualquiera. La vista "cuaderno" en su máxima expresión. De nada. XD | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Para%20recordarte%20XD.jpeg?raw=true" alt="Para recordarte XD" width="250"/>                  |
+| **El Puesto de Mando**<br>La calma antes de la tormenta numérica. La interfaz de escritorio, esperando tus órdenes con una elegancia imponente. | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Inicio%20de%20calculadora.jpeg?raw=true" alt="Inicio de calculadora" width="250"/> |
+| **Arma Táctica de Bolsillo**<br>Todo el poder de Facundo Killer, condensado para tu bolsillo. Lista para desatar el caos numérico donde sea que vayas.        | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Version%20movil.jpeg?raw=true" alt="Version movil" width="250"/> |
+| **Meditación sobre el Vacío**<br>La calculadora en plena acción, resolviendo dilemas existenciales como la multiplicación por cero. Poesía matemática.   | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Haciendo%20cuentas.jpeg?raw=true" alt="Haciendo cuentas" width="250"/> |
+| **Aritmética Sin Fronteras**<br>Demostrando que no hay suma demasiado larga ni pantalla demasiado pequeña. La victoria de las matemáticas móviles.      | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/mas%20cuentas%20moviles.jpeg?raw=true" alt="mas cuentas moviles" width="250"/> |
+| **La Verdad Revelada (XD)**<br>Un recordatorio de por qué esto no es una calculadora cualquiera. La vista "cuaderno" en su máxima expresión. De nada. XD | <img src="https://github.com/HectorDanielAyarachiFuentes/CALCULADORA-FACUNDO/blob/main/img/Para%20recordarte%20XD.jpeg?raw=true" alt="Para recordarte XD" width="250"/> |
 
 ---
 
@@ -57,6 +57,14 @@ Concebido y ejecutado por una mente brillante, un visionario del código.
 *   **GitHub del Creador**: [hectordanielayarachifuentes](https://github.com/hectordanielayarachifuentes)
 
 ---
+
+## 📜 Licencia
+
+Bajo la Licencia MIT. Eres libre de usar este código, pero replicar su espíritu es una tarea para valientes.
+
+---
+
+**Ahora ve. Calcula. Y sé legendario.**
 
 ## 📜 Licencia
 
