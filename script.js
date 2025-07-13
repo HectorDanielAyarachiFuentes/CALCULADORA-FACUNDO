@@ -83,23 +83,53 @@ function escribir(t) {
 }
 
 function activadoBotones(contDisplay) {
-    const operador = contDisplay.match(/[\+\-x/]/);
-    const numAr = contDisplay.split(operador);
-    const ultimoNumero = numAr[numAr.length - 1];
-    const demasiadosCaracteres = contDisplay.length >= 21;
-    const numeroDemasiadasCifras = ultimoNumero.length >= 15;
+    // --- ESTADO GENERAL ---
+    const esSoloCero = contDisplay === '0';
+    const tieneOperadorAlFinal = /[\+\-x/]$/.test(contDisplay);
+    const tieneComaAlFinal = /,$/.test(contDisplay);
 
+    // Separamos el string por CUALQUIER operador para analizar los números
+    const partes = contDisplay.split(/[\+\-x/]/);
+    const ultimoNumero = partes[partes.length - 1];
+
+    // --- LÍMITES ---
+    const demasiadosCaracteres = contDisplay.length >= 21;
+    const ultimoNumeroDemasiadoLargo = ultimoNumero.length >= 15;
+    
+    // --- HABILITAR/DESHABILITAR BOTONES ---
+
+    // 1. Botones numéricos (0-9)
+    const deshabilitarNumeros = demasiadosCaracteres || ultimoNumeroDemasiadoLargo;
     ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9'].forEach(id => {
-        document.getElementById(id).disabled = demasiadosCaracteres || numeroDemasiadasCifras;
+        document.getElementById(id).disabled = deshabilitarNumeros;
     });
 
-    document.getElementById("tmas").disabled = !(/^\d+(,\d+){0,1}(\+\d+(,\d+){0,1})*$/.test(contDisplay) && !demasiadosCaracteres);
-    document.getElementById("tcal").disabled = !(/^\d+(,\d+){0,1}([\+\/x\-#]\d+(,\d+){0,1})+$/.test(contDisplay));
-    const operadoresBasicosHabilitados = /^\d+(,\d+){0,1}$/.test(contDisplay) && !demasiadosCaracteres;
-    ['tpor', 'tdiv', 'tmen'].forEach(id => document.getElementById(id).disabled = !operadoresBasicosHabilitados);
-    document.getElementById("trai").disabled = !operadoresBasicosHabilitados;
-    document.getElementById("tpri").disabled = !(/^\d+$/.test(contDisplay) && contDisplay.length <= 8);
-    document.getElementById("tcom").disabled = !(/^(\d+(,\d+){0,1}[\+\/x-])*\d+$/.test(contDisplay) && !demasiadosCaracteres && !ultimoNumero.includes(','));
+    // 2. Operadores estándar (-, x, /) y Raíz (RC)
+    // Se habilitan solo si el display NO tiene ya un operador
+    const tieneOperadorGeneral = /[\+\-x/]/.test(contDisplay);
+    const puedeAnadirOperadorBasico = !esSoloCero && !tieneOperadorGeneral && !tieneComaAlFinal;
+    ['tmen', 'tpor', 'tdiv', 'trai'].forEach(id => {
+        document.getElementById(id).disabled = !puedeAnadirOperadorBasico || demasiadosCaracteres;
+    });
+
+    // 3. Botón de Suma (+)
+    // Puede hacer sumas en cadena (2+2+2). Se deshabilita solo si la cadena ya termina en operador o coma.
+    document.getElementById("tmas").disabled = esSoloCero || tieneOperadorAlFinal || tieneComaAlFinal || demasiadosCaracteres;
+
+    // 4. Botón de Coma (,)
+    // Se habilita si el último número no tiene ya una coma y no se superan los límites.
+    const puedeAnadirComa = !ultimoNumero.includes(',') && !tieneOperadorAlFinal && !deshabilitarNumeros;
+    document.getElementById("tcom").disabled = !puedeAnadirComa;
+    
+    // 5. Botón de Calcular (=)
+    // Se habilita si hay una operación completa y lista para ser calculada.
+    const esCalculable = tieneOperadorGeneral && !tieneOperadorAlFinal && !tieneComaAlFinal;
+    document.getElementById("tcal").disabled = !esCalculable;
+
+    // 6. Botón de Factor Primo (PRI - "|")
+    // Se habilita si hay un número entero, sin operadores y de longitud válida.
+    const esFactorizable = !tieneOperadorGeneral && /^\d+$/.test(contDisplay) && !esSoloCero && contDisplay.length <= 8;
+    document.getElementById("tpri").disabled = !esFactorizable;
 }
 
 // --- NAVEGACIÓN Y LÓGICA DE LA INTERFAZ ---
