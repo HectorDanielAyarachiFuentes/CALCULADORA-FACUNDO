@@ -32,8 +32,20 @@ let divext = false; // Estado para división expandida
 
 function alCargar() {
     document.getElementById("tpan").innerHTML = "Ver<br>Pantalla";
-    document.getElementById("trai").innerHTML = "RC";
-
+// Usa esto:
+document.getElementById("trai").innerHTML = `
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    stroke-width="2.5" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+    style="width: 1.2em; height: 1.2em;">
+      <path d="M4 12h2l4 8 4-16h8"></path>
+  </svg>
+`;
     w = window.innerHeight / 1.93;
 
     contenedor.style.width = `${w}px`;
