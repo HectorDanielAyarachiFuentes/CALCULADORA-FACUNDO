@@ -752,7 +752,11 @@ function crearFlechaLlevada(left, top, width, height) {
         path.style.strokeDashoffset = '0';
     });
 }
+ 
+// --- FIN- FUNCIÓN DE AYUDA MEJORADA PARA CREAR FLECHAS VISUALES CON SVG ---
 
+// --- Inicio    // Asegurar que todos los números tengan la misma cantidad de decimales.
+ 
 
 function suma(numerosAR) {
     // 1. PREPARACIÓN DE DATOS
@@ -869,3 +873,5 @@ function suma(numerosAR) {
         // ... (la lógica de la coma se puede añadir aquí si es necesario)
     }
 }
+
+// --- FIN    // Asegurar que todos los números tengan la misma cantidad de decimales.
