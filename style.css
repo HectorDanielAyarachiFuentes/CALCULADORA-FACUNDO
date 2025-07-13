@@ -454,7 +454,8 @@ header .subtitle a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    /* [top] [right] [bottom] [left] */
+    padding: 15px 80px 15px 20px; /* <--- Esta es la nueva línea */
     background-color: #2a2a2a;
     border-bottom: 1px solid #444;
 }
