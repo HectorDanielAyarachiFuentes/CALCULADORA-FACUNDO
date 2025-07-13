@@ -133,15 +133,58 @@ function calcular() {
 }
 function crearCelda(clase, texto, estilos) { const c=document.createElement("div");c.className=clase;c.innerHTML=texto;Object.assign(c.style,estilos);salida.appendChild(c); }
 
-// --- FUNCIÓN RESTAURADA ---
-// Se vuelve a incluir la función para dibujar las flechas de "llevada".
-function crearFlechaLlevada(left,top,width,height){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("width",width);s.setAttribute("height",height);s.style.position='absolute';s.style.left=`${left}px`;s.style.top=`${top}px`;s.style.overflow='visible';const d=document.createElementNS("http://www.w3.org/2000/svg","defs"),m=document.createElementNS("http://www.w3.org/2000/svg","marker"),i="arrowhead-"+Math.random().toString(36).substring(2,9);m.setAttribute("id",i);m.setAttribute("viewBox","0 0 10 10");m.setAttribute("refX",8);m.setAttribute("refY",5);m.setAttribute("markerWidth",5);m.setAttribute("markerHeight",5);m.setAttribute("orient","auto-start-reverse");const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d","M 0 0 L 10 5 L 0 10 z");p.setAttribute("fill","#ff5555");m.appendChild(p);d.appendChild(m);s.appendChild(d);const h=document.createElementNS("http://www.w3.org/2000/svg","path"),x1=width*.9,y1=height,cx=width*.1,cy=height,x2=width*.2,y2=height*.15;h.setAttribute("d",`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);h.setAttribute("stroke","#ff5555");h.setAttribute("stroke-width",2.5);h.setAttribute("stroke-linecap","round");h.setAttribute("fill","none");h.setAttribute("marker-end",`url(#${i})`);s.appendChild(h);const l=h.getTotalLength();h.style.strokeDasharray=l;h.style.strokeDashoffset=l;h.style.transition='stroke-dashoffset .8s cubic-bezier(0.68, -0.55, 0.27, 1.55)';requestAnimationFrame(()=>{h.style.strokeDashoffset='0'})}
+// --- FUNCIÓN RESTAURADA Y CORREGIDA ---
+// Se restaura la función para dibujar las flechas con su animación.
+function crearFlechaLlevada(left, top, width, height) {
+    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("width", width);
+    s.setAttribute("height", height);
+    s.style.position = "absolute";
+    s.style.left = `${left}px`;
+    s.style.top = `${top}px`;
+    s.style.overflow = "visible";
+    const d = document.createElementNS("http://www.w3.org/2000/svg", "defs"),
+        m = document.createElementNS("http://www.w3.org/2000/svg", "marker"),
+        i = "arrowhead-" + Math.random().toString(36).substring(2, 9);
+    m.setAttribute("id", i);
+    m.setAttribute("viewBox", "0 0 10 10");
+    m.setAttribute("refX", 8);
+    m.setAttribute("refY", 5);
+    m.setAttribute("markerWidth", 5);
+    m.setAttribute("markerHeight", 5);
+    m.setAttribute("orient", "auto-start-reverse");
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+    p.setAttribute("fill", "#ff5555");
+    m.appendChild(p);
+    d.appendChild(m);
+    s.appendChild(d);
+    const h = document.createElementNS("http://www.w3.org/2000/svg", "path"),
+        x1 = width * 0.9,
+        y1 = height,
+        cx = width * 0.1,
+        cy = height,
+        x2 = width * 0.2,
+        y2 = height * 0.15;
+    h.setAttribute("d", `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
+    h.setAttribute("stroke", "#ff5555");
+    h.setAttribute("stroke-width", 2.5);
+    h.setAttribute("stroke-linecap", "round");
+    h.setAttribute("fill", "none");
+    h.setAttribute("marker-end", `url(#${i})`);
+    s.appendChild(h);
+    salida.appendChild(s);
+    const l = h.getTotalLength();
+    h.style.strokeDasharray = l;
+    h.style.strokeDashoffset = l;
+    h.style.transition = "stroke-dashoffset .8s cubic-bezier(0.68, -0.55, 0.27, 1.55)";
+    requestAnimationFrame(() => {
+        h.style.strokeDashoffset = "0";
+    });
+}
 
-// --- FUNCIÓN RESTAURADA ---
-// Se vuelve a la versión original de la suma, que muestra los detalles de la operación.
 function suma(numerosAR) { let m=0;numerosAR.forEach(n=>m=Math.max(m,n[1]));let s=numerosAR.map(n=>n[0].padEnd(n[0].length+m-n[1],'0')),l=Math.max(...s.map(n=>n.length)),c=s.map(n=>n.padStart(l,'0'));let t=0n;c.forEach(n=>t+=BigInt(n));let r=t.toString(),a=Math.max(r.length,l+1),h=numerosAR.length+3,x=Math.max(h,a),g=(h>a)?(h-a)/2:0,e=0.95*w/x,f=e*multiplicadorTamFuente;let v={},o=0;for(let i=l-1;i>=0;i--){let u=o;c.forEach(n=>{u+=parseInt(n[i])});o=Math.floor(u/10);if(o>0){let d=i-1+(a-l);if(d>=0){v[d]=o.toString();let p=1.5+numerosAR.length-1+0.5,q=.8,z=p*e-q*e,y=e*.7,_=(d+g+.3)*e;crearFlechaLlevada(_,q*e,y,z)}}}let n=s.map(n=>n.padStart(a,' ')),j=r.padStart(a,' ');let b=1.5;for(const d in v){crearCelda("caja",v[d],{left:`${(parseInt(d)+g)*e}px`,top:`.1em`,width:`${e}px`,height:`${e}px`,fontSize:f*.7+'px',color:"red",textAlign:'center'})}n.forEach((p,q)=>{for(let i=0;i<p.length;i++){if(p[i]!==' '){crearCelda("caja",p[i],{left:`${(i+g)*e}px`,top:`${(q+b)*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:'#ffff00'})}}});let k=a-l-1,i=b+n.length-1;crearCelda("caja","+",{left:`${(k+g)*e}px`,top:`${i*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:'#ffff00'});let p=(b+n.length)*e;for(let q=0;q<j.length;q++){crearCelda("caja",j[q],{left:`${(q+g)*e}px`,top:`${p}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',borderTop:"2px #ddd solid",color:'#00ff00'})}}
 
-// La resta se mantiene simplificada
 function resta(numerosAR) {
     let m = Math.max(numerosAR[0][1], numerosAR[1][1]);
     let n1 = numerosAR[0][0].padEnd(numerosAR[0][0].length + m - numerosAR[0][1], '0');
@@ -167,7 +210,6 @@ function resta(numerosAR) {
     }
 }
 
-// La multiplicación se mantiene simplificada
 function multiplica(numerosAR) {
     let n1 = numerosAR[0][0], n2 = numerosAR[1][0];
     if (n1 === "0" || n2 === "0") {
