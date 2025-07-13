@@ -65,11 +65,3 @@ Bajo la Licencia MIT. Eres libre de usar este código, pero replicar su espírit
 ---
 
 **Ahora ve. Calcula. Y sé legendario.**
-
-## 📜 Licencia
-
-Bajo la Licencia MIT. Eres libre de usar este código, pero replicar su espíritu es una tarea para valientes.
-
----
-
-**Ahora ve. Calcula. Y sé legendario.**
