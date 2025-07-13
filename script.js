@@ -55,7 +55,7 @@ function alCargar() {
 
     contenedor.style.opacity = "1";
     display.innerHTML = '0';
-    
+
     activadoBotones('0');
     HistoryManager.init();
     HistoryPanel.init();
@@ -90,7 +90,7 @@ function activadoBotones(contDisplay) {
     const ultimoNumero = partes[partes.length - 1];
     const demasiadosCaracteres = contDisplay.length >= 21;
     const ultimoNumeroDemasiadoLargo = ultimoNumero.length >= 15;
-    
+
     const deshabilitarNumeros = demasiadosCaracteres || ultimoNumeroDemasiadoLargo;
     ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8', 't9'].forEach(id => {
         document.getElementById(id).disabled = deshabilitarNumeros;
@@ -105,7 +105,7 @@ function activadoBotones(contDisplay) {
 
     const puedeAnadirComa = !ultimoNumero.includes(',') && !tieneOperadorAlFinal && !deshabilitarNumeros;
     document.getElementById("tcom").disabled = !puedeAnadirComa;
-    
+
     const esCalculable = tieneOperadorGeneral && !tieneOperadorAlFinal && !tieneComaAlFinal;
     document.getElementById("tcal").disabled = !esCalculable;
 
@@ -123,18 +123,44 @@ function divideExpandida(esExpandida) { divext = esExpandida; botExp.style.displ
 // --- FUNCIONES DE CÁLCULO VISUAL ---
 // ======================================
 function calcular() {
-    const entrada = display.innerHTML; const operadorMatch = entrada.match(/[\+\-x/]/); if (!operadorMatch) return;
-    const operador = operadorMatch[0]; const numAr = entrada.split(operador);
-    const numerosAR = numAr.map(numStr => { let limpio = numStr.replace(/^0+(?!\b|,)/, ''); if (limpio.startsWith(',')) limpio = '0' + limpio; const p = limpio.indexOf(",")+1; const d = p>0?limpio.length-p:0; const v=limpio.replace(",",""); return [v||"0",d]; });
+    const entrada = display.innerHTML;
+    const operadorMatch = entrada.match(/[\+\-x/]/);
+    if (!operadorMatch) return;
+
+    const operador = operadorMatch[0];
+    const numAr = entrada.split(operador);
+
+    const numerosAR = numAr.map(numStr => {
+        let limpio = numStr.replace(/^0+(?!\b|,)/, '');
+        if (limpio.startsWith(',')) limpio = '0' + limpio;
+        const p = limpio.indexOf(",") + 1;
+        const d = p > 0 ? limpio.length - p : 0;
+        const v = limpio.replace(",", "");
+        return [v || "0", d];
+    });
+
     salida.innerHTML = "";
-    switch (operador) { case "+": suma(numerosAR); break; case "-": resta(numerosAR); break; case "x": multiplica(numerosAR); break; case "/": divext?divideExt(numerosAR):divide(numerosAR); break; }
-    if (!salida.innerHTML.includes("<p class='error'>")) { HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML }); }
+    switch (operador) {
+        case "+": suma(numerosAR); break;
+        case "-": resta(numerosAR); break;
+        case "x": multiplica(numerosAR); break;
+        case "/": divext ? divideExt(numerosAR) : divide(numerosAR); break;
+    }
+
+    if (!salida.innerHTML.includes("<p class='error'>")) {
+        HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML });
+    }
     bajarteclado();
 }
-function crearCelda(clase, texto, estilos) { const c=document.createElement("div");c.className=clase;c.innerHTML=texto;Object.assign(c.style,estilos);salida.appendChild(c); }
 
-// --- FUNCIÓN RESTAURADA Y CORREGIDA ---
-// Se restaura la función para dibujar las flechas con su animación.
+function crearCelda(clase, texto, estilos) {
+    const celda = document.createElement("div");
+    celda.className = clase;
+    celda.innerHTML = texto;
+    Object.assign(celda.style, estilos);
+    salida.appendChild(celda);
+}
+
 function crearFlechaLlevada(left, top, width, height) {
     const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     s.setAttribute("width", width);
@@ -160,12 +186,7 @@ function crearFlechaLlevada(left, top, width, height) {
     d.appendChild(m);
     s.appendChild(d);
     const h = document.createElementNS("http://www.w3.org/2000/svg", "path"),
-        x1 = width * 0.9,
-        y1 = height,
-        cx = width * 0.1,
-        cy = height,
-        x2 = width * 0.2,
-        y2 = height * 0.15;
+        x1 = width * 0.9, y1 = height, cx = width * 0.1, cy = height, x2 = width * 0.2, y2 = height * 0.15;
     h.setAttribute("d", `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
     h.setAttribute("stroke", "#ff5555");
     h.setAttribute("stroke-width", 2.5);
@@ -178,12 +199,77 @@ function crearFlechaLlevada(left, top, width, height) {
     h.style.strokeDasharray = l;
     h.style.strokeDashoffset = l;
     h.style.transition = "stroke-dashoffset .8s cubic-bezier(0.68, -0.55, 0.27, 1.55)";
-    requestAnimationFrame(() => {
-        h.style.strokeDashoffset = "0";
-    });
+    requestAnimationFrame(() => { h.style.strokeDashoffset = "0"; });
 }
 
-function suma(numerosAR) { let m=0;numerosAR.forEach(n=>m=Math.max(m,n[1]));let s=numerosAR.map(n=>n[0].padEnd(n[0].length+m-n[1],'0')),l=Math.max(...s.map(n=>n.length)),c=s.map(n=>n.padStart(l,'0'));let t=0n;c.forEach(n=>t+=BigInt(n));let r=t.toString(),a=Math.max(r.length,l+1),h=numerosAR.length+3,x=Math.max(h,a),g=(h>a)?(h-a)/2:0,e=0.95*w/x,f=e*multiplicadorTamFuente;let v={},o=0;for(let i=l-1;i>=0;i--){let u=o;c.forEach(n=>{u+=parseInt(n[i])});o=Math.floor(u/10);if(o>0){let d=i-1+(a-l);if(d>=0){v[d]=o.toString();let p=1.5+numerosAR.length-1+0.5,q=.8,z=p*e-q*e,y=e*.7,_=(d+g+.3)*e;crearFlechaLlevada(_,q*e,y,z)}}}let n=s.map(n=>n.padStart(a,' ')),j=r.padStart(a,' ');let b=1.5;for(const d in v){crearCelda("caja",v[d],{left:`${(parseInt(d)+g)*e}px`,top:`.1em`,width:`${e}px`,height:`${e}px`,fontSize:f*.7+'px',color:"red",textAlign:'center'})}n.forEach((p,q)=>{for(let i=0;i<p.length;i++){if(p[i]!==' '){crearCelda("caja",p[i],{left:`${(i+g)*e}px`,top:`${(q+b)*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:'#ffff00'})}}});let k=a-l-1,i=b+n.length-1;crearCelda("caja","+",{left:`${(k+g)*e}px`,top:`${i*e}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',color:'#ffff00'});let p=(b+n.length)*e;for(let q=0;q<j.length;q++){crearCelda("caja",j[q],{left:`${(q+g)*e}px`,top:`${p}px`,width:`${e}px`,height:`${e}px`,fontSize:f+'px',borderTop:"2px #ddd solid",color:'#00ff00'})}}
+function suma(numerosAR) {
+    let maxDecimales = 0;
+    numerosAR.forEach(n => maxDecimales = Math.max(maxDecimales, n[1]));
+    let operandos = numerosAR.map(n => n[0].padEnd(n[0].length + maxDecimales - n[1], '0'));
+    
+    let longitudMaxOperandos = Math.max(...operandos.map(n => n.length));
+    let operandosCalculo = operandos.map(n => n.padStart(longitudMaxOperandos, '0'));
+    let total = 0n;
+    operandosCalculo.forEach(n => total += BigInt(n));
+    let resultado = total.toString();
+
+    let anchoGrid = Math.max(resultado.length, longitudMaxOperandos + 1);
+    let altoGrid = numerosAR.length + 3;
+    let dimensionMax = Math.max(altoGrid, anchoGrid);
+    let offsetHorizontal = (dimensionMax > anchoGrid) ? (dimensionMax - anchoGrid) / 2 : 0;
+    let tamCelda = 0.95 * w / dimensionMax;
+    let tamFuente = tamCelda * multiplicadorTamFuente;
+
+    let llevadas = {};
+    let carry = 0;
+    for (let i = longitudMaxOperandos - 1; i >= 0; i--) {
+        let sumaColumna = carry;
+        operandosCalculo.forEach(n => { sumaColumna += parseInt(n[i]) });
+        carry = Math.floor(sumaColumna / 10);
+        if (carry > 0) {
+            let posLlevada = i - 1 + (anchoGrid - longitudMaxOperandos);
+            if (posLlevada >= 0) {
+                llevadas[posLlevada] = carry.toString();
+                let topFlecha = 1.5 + numerosAR.length - 1 + 0.5;
+                let topLlevada = .8;
+                let altoFlecha = topFlecha * tamCelda - topLlevada * tamCelda;
+                let anchoFlecha = tamCelda * .7;
+                let leftFlecha = (posLlevada + offsetHorizontal + .3) * tamCelda;
+                crearFlechaLlevada(leftFlecha, topLlevada * tamCelda, anchoFlecha, altoFlecha);
+            }
+        }
+    }
+
+    let yOffsetBase = 1.5;
+    for (const pos in llevadas) {
+        crearCelda("caja", llevadas[pos], {
+            left: `${(parseInt(pos) + offsetHorizontal) * tamCelda}px`, top: `.1em`,
+            width: `${tamCelda}px`, height: `${tamCelda}px`,
+            fontSize: tamFuente * .7 + 'px', color: "red", textAlign: 'center'
+        });
+    }
+
+    operandos.forEach((numStr, index) => {
+        for (let i = 0; i < numStr.length; i++) {
+            crearCelda("caja3", numStr[i], {
+                left: `${(anchoGrid - numStr.length + i + offsetHorizontal) * tamCelda}px`,
+                top: `${(index + yOffsetBase) * tamCelda}px`,
+                width: `${tamCelda}px`, height: `${tamCelda}px`,
+                fontSize: `${tamFuente}px`, color: '#ffff00'
+            });
+        }
+    });
+    
+    let yResultado = (yOffsetBase + operandos.length) * tamCelda;
+    for (let i = 0; i < resultado.length; i++) {
+        crearCelda("caja4", resultado[i], {
+            left: `${(anchoGrid - resultado.length + i + offsetHorizontal) * tamCelda}px`,
+            top: `${yResultado}px`,
+            width: `${tamCelda}px`, height: `${tamCelda}px`,
+            fontSize: `${tamFuente}px`, borderTop: "2px #ddd solid", color: '#00ff00'
+        });
+    }
+}
 
 function resta(numerosAR) {
     let m = Math.max(numerosAR[0][1], numerosAR[1][1]);
@@ -211,52 +297,329 @@ function resta(numerosAR) {
 }
 
 function multiplica(numerosAR) {
-    let n1 = numerosAR[0][0], n2 = numerosAR[1][0];
-    if (n1 === "0" || n2 === "0") {
-        salida.innerHTML = errorMessages.multiplicacion1;
+    const num1 = numerosAR[0][0];
+    const num2 = numerosAR[1][0];
+    const numDec1 = numerosAR[0][1];
+    const numDec2 = numerosAR[1][1];
+    const maxNumDecimales = numDec1 + numDec2;
+
+    if (num1 === "0" || num2 === "0") {
+        salida.innerHTML = errorMessages.multiplicacion1; return;
+    }
+
+    const resultadoS = (BigInt(num1) * BigInt(num2)).toString();
+    if (resultadoS.length > 20) {
+        salida.innerHTML = errorMessages.multiplicacion2; return;
+    }
+
+    const anchuraMultiplicacion = Math.max(num1.length, num2.length + 1, resultadoS.length);
+    const alturaMultiplicacion = (num2.length > 1) ? 3 + num2.length : 3;
+    const maxDim = Math.max(alturaMultiplicacion, anchuraMultiplicacion);
+    const m = (maxDim - anchuraMultiplicacion) / 2;
+    const tamCel = 0.95 * w / maxDim;
+    const tamFuente = tamCel * multiplicadorTamFuente;
+
+    for (let i = 0; i < num1.length; i++) {
+        crearCelda("caja3", num1[i], {
+            left: `${(anchuraMultiplicacion - num1.length + i + m) * tamCel}px`, top: "0px",
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        });
+    }
+    if (numDec1 > 0) crearCelda("caja", ",", { right: `${(numDec1 + m - 0.5) * tamCel}px`, top: "0px", width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px` });
+
+    crearCelda("caja", "x", {
+        left: `${(anchuraMultiplicacion - num2.length - 1 + m) * tamCel}px`, top: `${tamCel}px`,
+        width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`, color: "#ddd", borderBottom: "2px #ddd solid"
+    });
+    for (let i = 0; i < num2.length; i++) {
+        crearCelda("caja3", num2[i], {
+            left: `${(anchuraMultiplicacion - num2.length + i + m) * tamCel}px`, top: `${tamCel}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`, borderBottom: "2px #ddd solid"
+        });
+    }
+    if (numDec2 > 0) crearCelda("caja", ",", { right: `${(numDec2 + m - 0.5) * tamCel}px`, top: `${tamCel}px`, width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px` });
+
+    let fila = 2;
+    if (num2.length > 1) {
+        for (let i = num2.length - 1; i >= 0; i--) {
+            let resultadoFila = (BigInt(num1) * BigInt(num2[i])).toString();
+            let col = num2.length - 1 - i;
+            for (let j = 0; j < resultadoFila.length; j++) {
+                crearCelda("caja2", resultadoFila[j], {
+                    left: `${(anchuraMultiplicacion - resultadoFila.length + j - col + m) * tamCel}px`, top: `${fila * tamCel}px`,
+                    width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+                    borderTop: (i === num2.length - 1) ? "2px #ddd solid" : "none"
+                });
+            }
+            fila++;
+        }
+    }
+
+    const posResultadoY = (num2.length > 1 ? fila : 2) * tamCel;
+    for (let i = 0; i < resultadoS.length; i++) {
+        crearCelda("caja4", resultadoS[i], {
+            left: `${(anchuraMultiplicacion - resultadoS.length + i + m) * tamCel}px`, top: `${posResultadoY}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`, borderTop: "2px #ddd solid"
+        });
+    }
+    if (maxNumDecimales > 0) crearCelda("caja", ",", { right: `${(maxNumDecimales + m - 0.5) * tamCel}px`, top: `${posResultadoY}px`, width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px` });
+}
+
+// --- FUNCIONES DE DIVISIÓN INTEGRADAS ---
+function divide(numerosAR) {
+    botExp.style.display = "inline-block";
+    botNor.style.display = "none";
+
+    let num1Str = numerosAR[0][0], num2Str = numerosAR[1][0];
+    let numDec1 = numerosAR[0][1], numDec2 = numerosAR[1][1];
+
+    if (BigInt(num2Str) === 0n) {
+        salida.innerHTML = BigInt(num1Str) === 0n ? errorMessages.division3 : errorMessages.division2;
         return;
     }
-    let r = (BigInt(n1) * BigInt(n2)).toString();
-    if (r.length > 20) {
-        salida.innerHTML = errorMessages.multiplicacion2;
+    if (BigInt(num1Str) === 0n) {
+        salida.innerHTML = errorMessages.division1;
         return;
     }
-    const h = 3;
-    let a = Math.max(n1.length, n2.length + 1, r.length),
-        m = Math.max(h, a),
-        g = (m - a) / 2,
-        e = 0.95 * w / m,
-        f = e * multiplicadorTamFuente;
-    for (let i = 0; i < n1.length; i++) {
-        crearCelda("caja3", n1[i], { left: `${(a - n1.length + i + g) * e}px`, top: "0px", width: `${e}px`, height: `${e}px`, fontSize: f + 'px' });
+
+    if (numDec2 > numDec1) {
+        num1Str = num1Str.padEnd(num1Str.length + (numDec2 - numDec1), '0');
+        numDec1 = numDec2;
     }
-    crearCelda("caja", "x", { left: `${(a - n2.length - 1 + g) * e}px`, top: `${e}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', color: "#ddd"});
-    for (let i = 0; i < n2.length; i++) {
-        crearCelda("caja3", n2[i], { left: `${(a - n2.length + i + g) * e}px`, top: `${e}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px'});
+    let decimalesDividendo = numDec1 - numDec2;
+    let resultado = (BigInt(num1Str) / BigInt(num2Str)).toString();
+
+    while (resultado.length < decimalesDividendo + 1) {
+        resultado = "0" + resultado;
     }
-    let p = 2 * e;
-    for (let i = 0; i < r.length; i++) {
-        crearCelda("caja4", r[i], { left: `${(a - r.length + i + g) * e}px`, top: `${p}px`, width: `${e}px`, height: `${e}px`, fontSize: f + 'px', borderTop: "2px #ddd solid" });
+
+    const longitudSalida = 1 + Math.max(num1Str.length + num2Str.length, num1Str.length + resultado.length);
+    const tamCel = 0.95 * w / longitudSalida;
+    const tamFuente = tamCel * multiplicadorTamFuente;
+
+    let d = "";
+    let fila = 0;
+    const numAr = [ [num1Str, fila, num1Str.length] ];
+    fila++;
+
+    for (let col = 0; col < num1Str.length; col++) {
+        d += num1Str[col];
+        if (BigInt(d) >= BigInt(num2Str)) {
+            d = (BigInt(d) % BigInt(num2Str)).toString();
+            if (col + 1 < num1Str.length) {
+                let numero = d + num1Str[col + 1];
+                if (numero.length < num2Str.length + 1) numero = "0" + numero;
+                numAr.push([numero, fila, col + 2]);
+            } else {
+                numAr.push([d.toString(), fila, col + 1]);
+            }
+            fila++;
+        }
+    }
+
+    numAr.forEach((item, i) => {
+        const num = item[0], filaActual = item[1], colFin = item[2];
+        for (let j = 0; j < num.length; j++) {
+            const col = colFin - num.length + j;
+            crearCelda(i === 0 ? "caja" : "caja2", num[j], {
+                left: `${col * tamCel}px`, top: `${filaActual * tamCel}px`,
+                width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            });
+        }
+    });
+    if (decimalesDividendo > 0) {
+        crearCelda("caja", ",", {
+            left: `${(num1Str.length - decimalesDividendo - 0.5) * tamCel}px`, top: "0px",
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        });
+    }
+
+    const inicioNum2 = 1 + num1Str.length;
+    for (let i = 0; i < num2Str.length; i++) {
+        crearCelda("caja3", num2Str[i], {
+            left: `${(inicioNum2 + i) * tamCel}px`, top: "0px",
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            borderLeft: i === 0 ? "2px #ddd solid" : "none",
+            borderBottom: "2px #ddd solid",
+        });
+    }
+
+    const inicioResultado = 1 + num1Str.length;
+    for (let i = 0; i < resultado.length; i++) {
+        crearCelda("caja4", resultado[i], {
+            left: `${(inicioResultado + i) * tamCel}px`, top: `${tamCel}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            borderTop: "2px #ddd solid",
+        });
+    }
+    if (decimalesDividendo > 0) {
+        crearCelda("caja", ",", {
+            left: `${(inicioResultado + resultado.length - decimalesDividendo - 0.5) * tamCel}px`, top: `${tamCel}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        });
     }
 }
-function divide(numerosAR){salida.innerHTML="<p class='error'>Visualización de división no implementada.</p>"}
-function divideExt(numerosAR){salida.innerHTML="<p class='error'>Visualización de división extendida no implementada.</p>"}
+
+function divideExt(numerosAR) {
+    botExp.style.display = "none";
+    botNor.style.display = "inline-block";
+
+    let num1Str = numerosAR[0][0], num2Str = numerosAR[1][0];
+    let numDec1 = numerosAR[0][1], numDec2 = numerosAR[1][1];
+
+    if (BigInt(num2Str) === 0n) {
+        salida.innerHTML = BigInt(num1Str) === 0n ? errorMessages.division3 : errorMessages.division2;
+        return;
+    }
+    if (BigInt(num1Str) === 0n) {
+        salida.innerHTML = errorMessages.division1;
+        return;
+    }
+
+    if (numDec2 > numDec1) {
+        num1Str = num1Str.padEnd(num1Str.length + (numDec2 - numDec1), '0');
+        numDec1 = numDec2;
+    }
+    let decimalesDividendo = numDec1 - numDec2;
+    let resultado = (BigInt(num1Str) / BigInt(num2Str)).toString();
+    while (resultado.length < decimalesDividendo + 1) {
+        resultado = "0" + resultado;
+    }
+
+    const longitudSalida = 2 + Math.max(num1Str.length + num2Str.length, num1Str.length + resultado.length);
+    const tamCel = 0.95 * w / longitudSalida;
+    const tamFuente = tamCel * multiplicadorTamFuente;
+
+    const restas = [], posUltCif = [];
+    let dividendoParcialStr = "";
+
+    for (let i = 0; i < num1Str.length; i++) {
+        dividendoParcialStr += num1Str[i];
+        let cocienteParcialStr = (BigInt(dividendoParcialStr) / BigInt(num2Str)).toString();
+
+        if (BigInt(cocienteParcialStr) > 0) {
+            let aRestar = (BigInt(cocienteParcialStr) * BigInt(num2Str)).toString();
+            restas.push(aRestar);
+            posUltCif.push(i + 1);
+            dividendoParcialStr = (BigInt(dividendoParcialStr) % BigInt(num2Str)).toString();
+        }
+    }
+
+    crearCelda("caja", num1Str, {
+        left: `${tamCel}px`, top: `0px`,
+        width: `${num1Str.length * tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        textAlign: 'right'
+    });
+
+    let topOffset = 1, restoAnterior = "";
+    for (let i = 0; i < restas.length; i++) {
+        let aRestarStr = "-" + restas[i];
+        let colResta = (posUltCif[i] + 1 - aRestarStr.length) * tamCel;
+
+        crearCelda("caja3 ra", aRestarStr, {
+            left: `${colResta}px`, top: `${topOffset * tamCel}px`,
+            width: `${aRestarStr.length * tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            textAlign: 'right'
+        });
+        topOffset++;
+
+        let dividendoParcial = restoAnterior + num1Str.substring(i === 0 ? 0 : posUltCif[i - 1], posUltCif[i]);
+        let restoActual = (BigInt(dividendoParcial) - BigInt(restas[i])).toString();
+        let colResto = (posUltCif[i] + 1 - restoActual.length) * tamCel;
+
+        crearCelda("caja2", restoActual, {
+            left: `${colResto}px`, top: `${topOffset * tamCel}px`,
+            width: `${restoActual.length * tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            textAlign: 'right', borderTop: '2px #ddd solid'
+        });
+        restoAnterior = restoActual;
+    }
+
+    if (decimalesDividendo > 0) {
+        crearCelda("caja", ",", {
+            left: `${(num1Str.length - decimalesDividendo + 0.5) * tamCel}px`, top: "0px",
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        });
+    }
+
+    const inicioNum2 = 2 + num1Str.length;
+    for (let i = 0; i < num2Str.length; i++) {
+        crearCelda("caja3", num2Str[i], {
+            left: `${(inicioNum2 + i) * tamCel}px`, top: "0px",
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            borderLeft: i === 0 ? "2px #ddd solid" : "none", borderBottom: "2px #ddd solid",
+        });
+    }
+    const inicioResultado = 2 + num1Str.length;
+    for (let i = 0; i < resultado.length; i++) {
+        crearCelda("caja4", resultado[i], {
+            left: `${(inicioResultado + i) * tamCel}px`, top: `${tamCel}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`, borderTop: "2px #ddd solid",
+        });
+    }
+    if (decimalesDividendo > 0) {
+        crearCelda("caja", ",", {
+            left: `${(inicioResultado + resultado.length - decimalesDividendo - 0.5) * tamCel}px`, top: `${tamCel}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        });
+    }
+}
 
 function desFacPri() {
-    salida.innerHTML = ""; const entrada = display.innerHTML; let numIzda = parseInt(entrada, 10);
-    if (isNaN(numIzda) || numIzda === 0) { salida.innerHTML = errorMessages.dFactorial1; bajarteclado(); return; }
-    let numIzdaArray=[numIzda],numDchaArray=[],i=2,tempNum=numIzda;
-    while(i<=tempNum){if(tempNum%i===0){numDchaArray.push(i);tempNum/=i;numIzdaArray.push(tempNum)}else{i++}}
-    if(numIzdaArray[numIzdaArray.length-1]!==1&&numIzdaArray.length>1){numIzdaArray.pop()}else if(numIzdaArray.length===1){numDchaArray.push(numIzda);numIzdaArray.push(1)}
-    const aI=numIzdaArray[0].toString().length,aD=Math.max(...numDchaArray.map(n=>n.toString().length)),aP=aI+aD,hP=numIzdaArray.length,mD=Math.max(aP+1,hP),m=(hP>aP)?(hP-aP)/2:0,tC=0.95*w/mD,tF=tC*multiplicadorTamFuente;
-    numIzdaArray.forEach((n,i)=>{let s=n.toString().padStart(aI,' ');for(let j=0;j<s.length;j++){crearCelda("caja2",s[j],{left:`${(j+m)*tC}px`,top:`${i*tC}px`,width:`${tC}px`,height:`${tC}px`,fontSize:`${tF}px`,borderRight:j===s.length-1?"2px #ddd solid":"none"})}});
-    numDchaArray.forEach((n,i)=>{let s=n.toString();for(let j=0;j<s.length;j++){crearCelda("caja3",s[j],{left:`${(j+aI+m+1)*tC}px`,top:`${i*tC}px`,width:`${tC}px`,height:`${tC}px`,fontSize:`${tF}px`})}});
-    HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML }); bajarteclado();
+    salida.innerHTML = "";
+    const entrada = display.innerHTML;
+    let numIzda = parseInt(entrada, 10);
+    if (isNaN(numIzda) || numIzda === 0) {
+        salida.innerHTML = errorMessages.dFactorial1;
+        bajarteclado();
+        return;
+    }
+    let numIzdaArray = [numIzda], numDchaArray = [], i = 2, tempNum = numIzda;
+    while (i <= tempNum) {
+        if (tempNum % i === 0) {
+            numDchaArray.push(i);
+            tempNum /= i;
+            numIzdaArray.push(tempNum);
+        } else {
+            i++;
+        }
+    }
+    if (numIzdaArray[numIzdaArray.length - 1] !== 1 && numIzdaArray.length > 1) {
+        numIzdaArray.pop();
+    } else if (numIzdaArray.length === 1) {
+        numDchaArray.push(numIzda);
+        numIzdaArray.push(1);
+    }
+    const aI = numIzdaArray[0].toString().length,
+        aD = Math.max(...numDchaArray.map(n => n.toString().length)),
+        aP = aI + aD,
+        hP = numIzdaArray.length,
+        mD = Math.max(aP + 1, hP),
+        m = (hP > aP) ? (hP - aP) / 2 : 0,
+        tC = 0.95 * w / mD,
+        tF = tC * multiplicadorTamFuente;
+    numIzdaArray.forEach((n, i) => {
+        let s = n.toString().padStart(aI, ' ');
+        for (let j = 0; j < s.length; j++) {
+            crearCelda("caja2", s[j], { left: `${(j + m) * tC}px`, top: `${i * tC}px`, width: `${tC}px`, height: `${tC}px`, fontSize: `${tF}px`, borderRight: j === s.length - 1 ? "2px #ddd solid" : "none" });
+        }
+    });
+    numDchaArray.forEach((n, i) => {
+        let s = n.toString();
+        for (let j = 0; j < s.length; j++) {
+            crearCelda("caja3", s[j], { left: `${(j + aI + m + 1) * tC}px`, top: `${i * tC}px`, width: `${tC}px`, height: `${tC}px`, fontSize: `${tF}px` });
+        }
+    });
+    HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML });
+    bajarteclado();
 }
-function raizCuadrada() {salida.innerHTML="<p class='error'>Visualización de raíz cuadrada no implementada.</p>"; bajarteclado(); }
+function raizCuadrada() {
+    salida.innerHTML = "<p class='error'>Visualización de raíz cuadrada no implementada.</p>";
+    bajarteclado();
+}
 
 // ===================================
 // --- MÓDulos DE HISTORIAL ---
 // ===================================
-const HistoryManager=(function(){const e="calculatorHistory";let t=[];function n(){try{const o=localStorage.getItem(e);t=o?JSON.parse(o):[]}catch(o){console.error("Error al cargar historial:",o);t=[]}}function o(){try{localStorage.setItem(e,JSON.stringify(t))}catch(o){console.error("Error al guardar historial:",o)}}function r(e,n){window.dispatchEvent(new CustomEvent(e,{detail:n}))}return{init:function(){n()},add:function(e){const n=t.findIndex(t=>t.input===e.input);-1<n?(alert("¡Oye, chamaco! Esa operación ya está en tu historial."),r("history:duplicate",{index:n})):(t.unshift(e),o(),r("history:updated"))},getAll:function(){return[...t]},clear:function(){t=[];o();r("history:updated")}}})();
-const HistoryPanel=(function(){let e,t,n,o;function r(){const a=HistoryManager.getAll();t.innerHTML="";if(0===a.length){t.innerHTML='<li><span class="history-input">El historial está vacío.</span></li>';return}a.forEach((a,c)=>{const i=document.createElement("li");i.setAttribute("data-history-index",c);const s=document.createElement("div");s.innerHTML=a.visualHtml;const d=s.querySelectorAll("[style*='border-top']");let l=0<d.length?Array.from(d).map(e=>e.textContent).join("").trim():"";l=l||s.querySelector("p.error")?.textContent||"?";i.innerHTML=`<span class="history-input">${a.input}</span><span class="history-result-preview">= ${l}</span>`;t.appendChild(i)})}function a(){e.classList.toggle("open")}function c(c){const i=c.target.closest("li[data-history-index]");if(!i)return;const s=i.dataset.historyIndex,d=HistoryManager.getAll()[s];d&&(display.innerHTML=d.input,salida.innerHTML=d.visualHtml,activadoBotones(d.input),bajarteclado(),a())}function i(){confirm("¿Seguro que quieres borrar todo el historial?")&&HistoryManager.clear()}function s(t){const{index:r}=t.detail;e.classList.contains("open")||a();const c=list.querySelector(`li[data-history-index="${r}"]`);c&&(c.classList.remove("history-item-highlight"),void c.offsetWidth,c.classList.add("history-item-highlight"))}return{init:function(){e=document.getElementById("history-panel");t=document.getElementById("history-list");n=document.getElementById("history-toggle-btn");o=document.getElementById("clear-history-btn");n.addEventListener("click",a);o.addEventListener("click",i);t.addEventListener("click",c);window.addEventListener("history:updated",r);window.addEventListener("history:duplicate",s);r()}}})();
+const HistoryManager = (function() { const e = "calculatorHistory"; let t = []; function n() { try { const o = localStorage.getItem(e); t = o ? JSON.parse(o) : [] } catch (o) { console.error("Error al cargar historial:", o); t = [] } } function o() { try { localStorage.setItem(e, JSON.stringify(t)) } catch (o) { console.error("Error al guardar historial:", o) } } function r(e, n) { window.dispatchEvent(new CustomEvent(e, { detail: n })) } return { init: function() { n() }, add: function(e) { const n = t.findIndex(t => t.input === e.input); -1 < n ? (alert("¡Oye, chamaco! Esa operación ya está en tu historial."), r("history:duplicate", { index: n })) : (t.unshift(e), o(), r("history:updated")) }, getAll: function() { return [...t] }, clear: function() { t = []; o(); r("history:updated") } } })();
+const HistoryPanel = (function() { let e, t, n, o; function r() { const a = HistoryManager.getAll(); t.innerHTML = ""; if (0 === a.length) { t.innerHTML = '<li><span class="history-input">El historial está vacío.</span></li>'; return } a.forEach((a, c) => { const i = document.createElement("li"); i.setAttribute("data-history-index", c); const s = document.createElement("div"); s.innerHTML = a.visualHtml; const d = s.querySelectorAll("[style*='border-top']"); let l = 0 < d.length ? Array.from(d).map(e => e.textContent).join("").trim() : ""; l = l || s.querySelector("p.error")?.textContent || "?"; i.innerHTML = `<span class="history-input">${a.input}</span><span class="history-result-preview">= ${l}</span>`; t.appendChild(i) }) } function a() { e.classList.toggle("open") } function c(c) { const i = c.target.closest("li[data-history-index]"); if (!i) return; const s = i.dataset.historyIndex, d = HistoryManager.getAll()[s]; d && (display.innerHTML = d.input, salida.innerHTML = d.visualHtml, activadoBotones(d.input), bajarteclado(), a()) } function i() { confirm("¿Seguro que quieres borrar todo el historial?") && HistoryManager.clear() } function s(t) { const { index: r } = t.detail; e.classList.contains("open") || a(); const c = list.querySelector(`li[data-history-index="${r}"]`); c && (c.classList.remove("history-item-highlight"), void c.offsetWidth, c.classList.add("history-item-highlight")) } return { init: function() { e = document.getElementById("history-panel"); t = document.getElementById("history-list"); n = document.getElementById("history-toggle-btn"); o = document.getElementById("clear-history-btn"); n.addEventListener("click", a); o.addEventListener("click", i); t.addEventListener("click", c); window.addEventListener("history:updated", r); window.addEventListener("history:duplicate", s); r() } } })();
