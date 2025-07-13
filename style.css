@@ -251,3 +251,16 @@ header .subtitle a:hover { color: var(--color-title-2); }
     #botexp, #botnor { font-size: 3.2vw !important; padding: 7px; }
     .error { font-size: 4vw !important; }
 }
+
+
+/* Animación de parpadeo para destacar un elemento */
+@keyframes flash-animation {
+    0% { background-color: #2c3e50; } /* Color de hover */
+    50% { background-color: #3498db; } /* Un azul brillante */
+    100% { background-color: #2c3e50; }
+}
+
+/* Clase que se aplicará al elemento del historial duplicado */
+.history-item-highlight {
+    animation: flash-animation 1s ease-in-out;
+}
