@@ -68,7 +68,21 @@
         </div>
         
     </div>
+<!-- Botón para mostrar/ocultar el historial -->
+<button id="history-toggle-btn" title="Historial">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13,3A9,9,0,0,0,4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7,0,0,1,13,5V8L18,4L13,0V3M12,12.5A1.5,1.5,0,0,0,10.5,14A1.5,1.5,0,0,0,12,15.5A1.5,1.5,0,0,0,13.5,14A1.5,1.5,0,0,0,12,12.5Z"/></svg>
+</button>
 
+<!-- Panel del Historial (inicialmente oculto) -->
+<div id="history-panel">
+    <div class="history-header">
+        <h2>Historial</h2>
+        <button id="clear-history-btn">Limpiar</button>
+    </div>
+    <ul id="history-list">
+        <!-- Las entradas del historial se añadirán aquí con JS -->
+    </ul>
+</div>
     <script src="script.js"></script>
 </body>
 </html>
