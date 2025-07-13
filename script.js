@@ -32,20 +32,19 @@ let divext = false; // Estado para división expandida
 
 function alCargar() {
     document.getElementById("tpan").innerHTML = "Ver<br>Pantalla";
-// Usa esto:
-document.getElementById("trai").innerHTML = `
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    stroke-width="2.5" 
-    stroke-linecap="round" 
-    stroke-linejoin="round" 
-    style="width: 1.2em; height: 1.2em;">
-      <path d="M4 12h2l4 8 4-16h8"></path>
-  </svg>
-`;
+    document.getElementById("trai").innerHTML = `
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        style="width: 1.2em; height: 1.2em;">
+          <path d="M4 12h2l4 8 4-16h8"></path>
+      </svg>
+    `;
     w = window.innerHeight / 1.93;
 
     contenedor.style.width = `${w}px`;
@@ -150,7 +149,8 @@ function calcular() {
         const v = limpio.replace(",", "");
         return [v || "0", d];
     });
-
+    
+    // La limpieza principal se hace aquí, pero la hemos reforzado en cada sub-función.
     salida.innerHTML = "";
     switch (operador) {
         case "+": suma(numerosAR); break;
@@ -215,6 +215,7 @@ function crearFlechaLlevada(left, top, width, height) {
 }
 
 function suma(numerosAR) {
+    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla para evitar datos fantasma.
     let maxDecimales = 0;
     numerosAR.forEach(n => maxDecimales = Math.max(maxDecimales, n[1]));
     let operandos = numerosAR.map(n => n[0].padEnd(n[0].length + maxDecimales - n[1], '0'));
@@ -236,7 +237,7 @@ function suma(numerosAR) {
     let carry = 0;
     for (let i = longitudMaxOperandos - 1; i >= 0; i--) {
         let sumaColumna = carry;
-        operandosCalculo.forEach(n => { sumaColumna += parseInt(n[i]) });
+        operandosCalculo.forEach(n => { sumaColumna += parseInt(n[i] || '0') });
         carry = Math.floor(sumaColumna / 10);
         if (carry > 0) {
             let posLlevada = i - 1 + (anchoGrid - longitudMaxOperandos);
@@ -284,6 +285,7 @@ function suma(numerosAR) {
 }
 
 function resta(numerosAR) {
+    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
     let m = Math.max(numerosAR[0][1], numerosAR[1][1]);
     let n1 = numerosAR[0][0].padEnd(numerosAR[0][0].length + m - numerosAR[0][1], '0');
     let n2 = numerosAR[1][0].padEnd(numerosAR[1][0].length + m - numerosAR[1][1], '0');
@@ -309,6 +311,7 @@ function resta(numerosAR) {
 }
 
 function multiplica(numerosAR) {
+    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
     const num1 = numerosAR[0][0];
     const num2 = numerosAR[1][0];
     const numDec1 = numerosAR[0][1];
@@ -377,11 +380,11 @@ function multiplica(numerosAR) {
     if (maxNumDecimales > 0) crearCelda("caja", ",", { right: `${(maxNumDecimales + m - 0.5) * tamCel}px`, top: `${posResultadoY}px`, width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px` });
 }
 
-// --- FUNCIONES DE DIVISIÓN INTEGRADAS ---
 function divide(numerosAR) {
+    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
     botExp.style.display = "inline-block";
     botNor.style.display = "none";
-
+    // ... el resto de la función sigue igual
     let num1Str = numerosAR[0][0], num2Str = numerosAR[1][0];
     let numDec1 = numerosAR[0][1], numDec2 = numerosAR[1][1];
 
@@ -473,9 +476,10 @@ function divide(numerosAR) {
 }
 
 function divideExt(numerosAR) {
+    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
     botExp.style.display = "none";
     botNor.style.display = "inline-block";
-
+    // ... el resto de la función sigue igual
     let num1Str = numerosAR[0][0], num2Str = numerosAR[1][0];
     let numDec1 = numerosAR[0][1], numDec2 = numerosAR[1][1];
 
@@ -625,24 +629,15 @@ function desFacPri() {
     HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML });
     bajarteclado();
 }
-function raizCuadrada() {
-    salida.innerHTML = "<p class='error'>Visualización de raíz cuadrada no implementada.</p>";
-    bajarteclado();
-}
 
 // ===================================================================
-// --- MÓDULOS COMPLETOS DE HISTORIAL (CORREGIDOS Y MEJORADOS) ---
+// --- MÓDULOS DE HISTORIAL ---
 // ===================================================================
 
-/**
- * HistoryManager: Se encarga de la lógica de datos del historial.
- * Guarda, carga, añade y borra operaciones del localStorage.
- */
 const HistoryManager = (function() {
-    const HISTORY_KEY = "calculatorHistory"; // Clave para el localStorage
-    let history = []; // Array interno para guardar el historial
+    const HISTORY_KEY = "calculatorHistory";
+    let history = [];
 
-    // Carga el historial desde localStorage al iniciar
     function loadHistory() {
         try {
             const storedHistory = localStorage.getItem(HISTORY_KEY);
@@ -653,7 +648,6 @@ const HistoryManager = (function() {
         }
     }
 
-    // Guarda el historial actual en localStorage
     function saveHistory() {
         try {
             localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
@@ -662,31 +656,24 @@ const HistoryManager = (function() {
         }
     }
 
-    // Dispara eventos personalizados para notificar a otras partes de la app
     function dispatchEvent(eventName, detail) {
         window.dispatchEvent(new CustomEvent(eventName, { detail }));
     }
 
-    // Métodos públicos del módulo
     return {
-        init: function() {
-            loadHistory();
-        },
+        init: function() { loadHistory(); },
         add: function(entry) {
             const existingIndex = history.findIndex(item => item.input === entry.input);
-            
             if (existingIndex > -1) {
                 alert("¡Oye, chamaco! Esa operación ya está en tu historial.");
                 dispatchEvent("history:duplicate", { index: existingIndex });
             } else {
-                history.unshift(entry); // Añade el nuevo elemento al principio
+                history.unshift(entry);
                 saveHistory();
                 dispatchEvent("history:updated");
             }
         },
-        getAll: function() {
-            return [...history]; // Devuelve una copia para evitar modificaciones externas
-        },
+        getAll: function() { return [...history]; },
         clear: function() {
             history = [];
             saveHistory();
@@ -695,19 +682,13 @@ const HistoryManager = (function() {
     };
 })();
 
-
-/**
- * HistoryPanel: Se encarga de la parte visual del historial.
- * Dibuja el panel, maneja los clics y responde a los eventos de HistoryManager.
- */
+// CORRECCIÓN: HistoryPanel ahora es más inteligente para extraer el resultado.
 const HistoryPanel = (function() {
-    // Variables para los elementos del DOM (más claras que e, t, n, o)
     let panelElement, listElement, toggleButton, clearButton;
 
-    // Dibuja (renderiza) la lista de operaciones en el panel
     function renderHistory() {
         const historyEntries = HistoryManager.getAll();
-        listElement.innerHTML = ""; // Limpia la lista antes de volver a dibujarla
+        listElement.innerHTML = "";
 
         if (historyEntries.length === 0) {
             listElement.innerHTML = '<li><span class="history-input">El historial está vacío.</span></li>';
@@ -718,57 +699,51 @@ const HistoryPanel = (function() {
             const listItem = document.createElement("li");
             listItem.setAttribute("data-history-index", index);
 
-            // --- AQUÍ ESTÁ LA CORRECCIÓN CLAVE ---
-            // Creamos un div temporal para procesar el HTML del resultado
             const tempDiv = document.createElement("div");
             tempDiv.innerHTML = entry.visualHtml;
+            
+            // --- INICIO DE LA CORRECCIÓN INTELIGENTE ---
+            const resultCells = tempDiv.querySelectorAll('.caja4');
+            let resultText;
 
-            // En lugar de una lógica compleja, simplemente obtenemos TODO el texto visible.
-            // .textContent obtiene "12" de "<p>12</p>", lo cual es perfecto.
-            // .trim() quita espacios sobrantes.
-            // || "?" es el valor por defecto si no hay nada.
-            const resultText = tempDiv.textContent.trim() || "?";
-            // --- FIN DE LA CORRECCIÓN ---
+            if (resultCells.length > 0) {
+                // Si encontramos celdas de resultado (.caja4), construimos el resultado solo con su texto.
+                resultText = Array.from(resultCells).map(cell => cell.textContent).join('').trim();
+            } else {
+                // Si no (para raíz cuadrada o errores), usamos el método anterior.
+                resultText = tempDiv.textContent.trim();
+            }
+            
+            resultText = resultText || "?"; // Fallback final.
+            // --- FIN DE LA CORRECCIÓN INTELIGENTE ---
 
             listItem.innerHTML = `<span class="history-input">${entry.input}</span><span class="history-result-preview">= ${resultText}</span>`;
             listElement.appendChild(listItem);
         });
     }
 
-    // Muestra u oculta el panel del historial
-    function togglePanel() {
-        panelElement.classList.toggle("open");
-    }
+    function togglePanel() { panelElement.classList.toggle("open"); }
 
-    // Se ejecuta cuando el usuario hace clic en un elemento del historial
     function handleItemClick(event) {
         const clickedItem = event.target.closest("li[data-history-index]");
         if (!clickedItem) return;
-
         const index = clickedItem.dataset.historyIndex;
         const historyEntry = HistoryManager.getAll()[index];
-
         if (historyEntry) {
-            // Asumo que tienes elementos con id 'display' y 'salida'
             display.innerHTML = historyEntry.input;
             salida.innerHTML = historyEntry.visualHtml;
-            
-            // Llama a otras funciones que puedas necesitar
             activadoBotones(historyEntry.input);
             bajarteclado();
-            
-            togglePanel(); // Cierra el panel después de la selección
+            togglePanel();
         }
     }
 
-    // Se ejecuta al hacer clic en el botón "Limpiar"
     function handleClearClick() {
         if (confirm("¿Seguro que quieres borrar todo el historial?")) {
             HistoryManager.clear();
         }
     }
 
-    // Resalta un elemento cuando se intenta añadir un duplicado
     function handleDuplicate(event) {
         const { index } = event.detail;
         if (!panelElement.classList.contains("open")) {
@@ -776,71 +751,46 @@ const HistoryPanel = (function() {
         }
         const itemToHighlight = listElement.querySelector(`li[data-history-index="${index}"]`);
         if (itemToHighlight) {
-            // Este truco reinicia la animación CSS para que se vea el efecto de nuevo
             itemToHighlight.classList.remove("history-item-highlight");
             void itemToHighlight.offsetWidth;
             itemToHighlight.classList.add("history-item-highlight");
         }
     }
 
-    // Métodos públicos del módulo
     return {
         init: function() {
-            // Asignación de elementos del DOM a las variables
             panelElement = document.getElementById("history-panel");
             listElement = document.getElementById("history-list");
             toggleButton = document.getElementById("history-toggle-btn");
             clearButton = document.getElementById("clear-history-btn");
-
-            // Asignación de eventos
             toggleButton.addEventListener("click", togglePanel);
             clearButton.addEventListener("click", handleClearClick);
             listElement.addEventListener("click", handleItemClick);
-
-            // Escucha los eventos personalizados de HistoryManager
             window.addEventListener("history:updated", renderHistory);
             window.addEventListener("history:duplicate", handleDuplicate);
-
-            renderHistory(); // Dibuja el historial por primera vez al cargar la página
+            renderHistory();
         }
     };
 })();
-
-// No te olvides de llamar a init en tu archivo principal para que todo empiece a funcionar
-// Ejemplo:
-// document.addEventListener('DOMContentLoaded', () => {
-//     HistoryManager.init();
-//     HistoryPanel.init();
-// });
-
-
-
-
-
 
 // =======================================================
 // --- FUNCIÓN DE RAÍZ CUADRADA (CORREGIDA Y SIMPLIFICADA) ---
 // =======================================================
 function raizCuadrada() {
-    // 1. Limpiar siempre la pantalla de resultados antes de empezar
     salida.innerHTML = "";
-    
-    // 2. Obtener la entrada y convertirla a número
     const entrada = display.innerHTML;
     const numero = parseInt(entrada, 10);
 
-    // 3. Validaciones (usando la lógica que ya tenías)
     if (isNaN(numero) || entrada.includes(',')) {
         salida.innerHTML = "<p class='error'>La raíz cuadrada solo funciona con números enteros.</p>";
         bajarteclado();
-        return; // Salir de la función
+        return;
     }
     if (numero === 0) {
-        salida.innerHTML = errorMessages.raiz1; // "La raíz cuadrada de cero es cero."
-        // Guardamos el resultado en el historial para consistencia
+        salida.innerHTML = errorMessages.raiz1;
         HistoryManager.add({ input: `√(${entrada})`, visualHtml: salida.innerHTML });
         bajarteclado();
-        return; // Salir
+        return;
     }
      if (numero < 0) {
         salida.innerHTML = "<p class='error'>No se puede calcular la raíz de un número negativo.</p>";
@@ -848,28 +798,21 @@ function raizCuadrada() {
         return; 
     }
 
-    // 4. Calcular el resultado
     const resultado = Math.sqrt(numero);
 
-    // 5. Validar si la raíz es exacta (entera)
     if (resultado % 1 !== 0) {
         salida.innerHTML = "<p class='error'>Este número no tiene una raíz cuadrada entera exacta.</p>";
         bajarteclado();
-        return; // Salir
+        return;
     }
 
-    // 6. Crear el HTML de salida (SIMPLE Y LIMPIO)
     const htmlResultado = `<p>${resultado}</p>`;
-    
-    // 7. Mostrar el resultado en la pantalla de salida
     salida.innerHTML = htmlResultado;
 
-    // 8. Guardar la operación CORRECTA en el historial
     HistoryManager.add({
-        input: `√(${entrada})`,       // La operación que se hizo
-        visualHtml: htmlResultado  // El resultado visual limpio
+        input: `√(${entrada})`,
+        visualHtml: htmlResultado
     });
 
-    // 9. Bajar el teclado para mostrar el resultado
     bajarteclado();
 }
