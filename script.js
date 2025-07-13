@@ -663,3 +663,141 @@ function divideExt(numerosAR) {
         });
     }
 }
+
+
+
+
+
+
+
+
+
+// --- FUNCIÓN DE AYUDA PARA CREAR FLECHAS VISUALES ---
+function crearFlechaLlevada(left, top, width, height) {
+    const flecha = document.createElement("div");
+    flecha.className = "carry-arrow";
+    Object.assign(flecha.style, {
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+    });
+    salida.appendChild(flecha);
+}
+
+
+function suma(numerosAR) {
+    // 1. PREPARACIÓN DE DATOS
+    // Asegurar que todos los números tengan la misma cantidad de decimales.
+    let maxNumDecimales = 0;
+    numerosAR.forEach(num => maxNumDecimales = Math.max(maxNumDecimales, num[1]));
+
+    let numStrings = numerosAR.map(num => 
+        num[0].padEnd(num[0].length + maxNumDecimales - num[1], '0')
+    );
+
+    // Encontrar la longitud máxima para la alineación.
+    const maxLength = Math.max(...numStrings.map(n => n.length));
+
+    // Crear una versión para el CÁLCULO, rellenada con '0'.
+    const calcNumbers = numStrings.map(n => n.padStart(maxLength, '0'));
+
+    // 2. CÁLCULO DE DIMENSIONES PARA EL DIBUJO
+    // Se realiza un cálculo temporal solo para saber el ancho final del resultado.
+    let tempSum = 0n;
+    calcNumbers.forEach(n => tempSum += BigInt(n));
+    const resultadoS = tempSum.toString();
+    
+    // El ancho de la cuadrícula se basa en el número más largo o el resultado.
+    const anchuraSuma = Math.max(resultadoS.length, maxLength + 1); // +1 para el espacio del signo '+'
+
+    // Calcular las dimensiones de cada celda.
+    const alturaSuma = numerosAR.length + 3;
+    const maxDim = Math.max(alturaSuma, anchuraSuma);
+    const m = (alturaSuma > anchuraSuma) ? (alturaSuma - anchuraSuma) / 2 : 0;
+    const tamCel = 0.95 * w / maxDim;
+    const tamFuente = tamCel * multiplicadorTamFuente;
+
+    // 3. LÓGICA DE SUMA Y DIBUJO DE FLECHAS
+    let llevadas = {}; // Usamos un objeto para mapear columna -> valor
+    let llevadaActual = 0;
+
+    for (let i = maxLength - 1; i >= 0; i--) {
+        let sumaColumna = llevadaActual;
+        calcNumbers.forEach(numStr => {
+            sumaColumna += parseInt(numStr[i]);
+        });
+
+        llevadaActual = Math.floor(sumaColumna / 10);
+
+        if (llevadaActual > 0) {
+            // Se calcula la columna de visualización donde irá la llevada y la flecha.
+            const displayCol = i - 1 + (anchuraSuma - maxLength);
+            if (displayCol >= 0) {
+                llevadas[displayCol] = llevadaActual.toString();
+
+                // --- Dibujar la flecha indicadora ---
+                const topInicioFlecha = (1.5 + numerosAR.length - 1 + 0.5) * tamCel;
+                const topFinFlecha = 0.8 * tamCel;
+                const arrowHeight = topInicioFlecha - topFinFlecha;
+                const arrowWidth = tamCel * 0.7;
+                const leftPos = (displayCol + m + 0.3) * tamCel;
+
+                crearFlechaLlevada(leftPos, topFinFlecha, arrowWidth, arrowHeight);
+            }
+        }
+    }
+
+    // 4. DIBUJO FINAL
+    // Preparar cadenas para VISUALIZACIÓN, rellenando con espacios.
+    const numerosFinales = numStrings.map(n => n.padStart(anchuraSuma, ' '));
+    const resultadoFinal = resultadoS.padStart(anchuraSuma, ' ');
+    const topOffset = 1.5;
+
+    // Dibujar las llevadas (números rojos)
+    for (const col in llevadas) {
+        crearCelda("caja", llevadas[col], {
+            left: `${(parseInt(col) + m) * tamCel}px`, top: `${0.1 * tamCel}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`,
+            fontSize: `${tamFuente * 0.7}px`, color: "red", textAlign: 'center'
+        });
+    }
+
+    // Dibujar los sumandos (números amarillos)
+    numerosFinales.forEach((numStr, i) => {
+        for (let j = 0; j < numStr.length; j++) {
+            // No dibujamos los espacios en blanco, solo los números.
+            if (numStr[j] !== ' ') {
+                 crearCelda("caja", numStr[j], {
+                    left: `${(j + m) * tamCel}px`, top: `${(i + topOffset) * tamCel}px`,
+                    width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+                    color: '#ffff00'
+                });
+            }
+        }
+    });
+
+    // Dibujar el signo '+'
+    const plusCol = anchuraSuma - maxLength - 1;
+    const plusRow = topOffset + numerosFinales.length - 1;
+     crearCelda("caja", "+", {
+        left: `${(plusCol + m) * tamCel}px`, top: `${plusRow * tamCel}px`,
+        width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+        color: '#ffff00'
+    });
+
+    // Dibujar el resultado (número verde)
+    let topResultado = (topOffset + numerosFinales.length) * tamCel;
+    for (let j = 0; j < resultadoFinal.length; j++) {
+         crearCelda("caja", resultadoFinal[j], {
+            left: `${(j + m) * tamCel}px`, top: `${topResultado}px`,
+            width: `${tamCel}px`, height: `${tamCel}px`, fontSize: `${tamFuente}px`,
+            borderTop: "2px #ddd solid", color: '#00ff00'
+        });
+    }
+    
+    // Dibujar la coma si es necesario
+    if (maxNumDecimales > 0) {
+        // ... (la lógica de la coma se puede añadir aquí si es necesario)
+    }
+}

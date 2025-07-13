@@ -357,3 +357,39 @@ header .subtitle a:hover {
         font-size: 4vw !important;
     }
 }
+
+
+
+
+
+
+/* Estilo para la flecha indicadora de la llevada en la suma */
+.carry-arrow {
+    position: absolute;
+    /* Usamos bordes para crear la línea de la flecha */
+    border-left: 2px solid #ff6666;  /* Un rojo ligeramente más visible */
+    border-bottom: 2px solid #ff6666;
+    /* Hacemos la esquina curva para que se vea más bonita */
+    border-bottom-left-radius: 10px; 
+    pointer-events: none; /* Para que no interfiera con el ratón */
+    opacity: 0.8;
+}
+
+/* Usamos un pseudo-elemento ::before para crear la punta de la flecha */
+.carry-arrow::before {
+    content: '';
+    position: absolute;
+    /* Posicionamos la punta justo al inicio de la línea izquierda */
+    left: -6px; 
+    top: -4px; 
+    
+    /* Truco CSS para crear un triángulo (la punta de la flecha) */
+    width: 0; 
+    height: 0; 
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent; 
+    border-right: 7px solid #ff6666; 
+    
+    /* Rotamos el triángulo para que apunte hacia arriba y a la izquierda */
+    transform: rotate(45deg); 
+}
