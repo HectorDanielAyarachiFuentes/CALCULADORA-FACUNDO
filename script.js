@@ -623,3 +623,141 @@ function raizCuadrada() {
 // ===================================
 const HistoryManager = (function() { const e = "calculatorHistory"; let t = []; function n() { try { const o = localStorage.getItem(e); t = o ? JSON.parse(o) : [] } catch (o) { console.error("Error al cargar historial:", o); t = [] } } function o() { try { localStorage.setItem(e, JSON.stringify(t)) } catch (o) { console.error("Error al guardar historial:", o) } } function r(e, n) { window.dispatchEvent(new CustomEvent(e, { detail: n })) } return { init: function() { n() }, add: function(e) { const n = t.findIndex(t => t.input === e.input); -1 < n ? (alert("¡Oye, chamaco! Esa operación ya está en tu historial."), r("history:duplicate", { index: n })) : (t.unshift(e), o(), r("history:updated")) }, getAll: function() { return [...t] }, clear: function() { t = []; o(); r("history:updated") } } })();
 const HistoryPanel = (function() { let e, t, n, o; function r() { const a = HistoryManager.getAll(); t.innerHTML = ""; if (0 === a.length) { t.innerHTML = '<li><span class="history-input">El historial está vacío.</span></li>'; return } a.forEach((a, c) => { const i = document.createElement("li"); i.setAttribute("data-history-index", c); const s = document.createElement("div"); s.innerHTML = a.visualHtml; const d = s.querySelectorAll("[style*='border-top']"); let l = 0 < d.length ? Array.from(d).map(e => e.textContent).join("").trim() : ""; l = l || s.querySelector("p.error")?.textContent || "?"; i.innerHTML = `<span class="history-input">${a.input}</span><span class="history-result-preview">= ${l}</span>`; t.appendChild(i) }) } function a() { e.classList.toggle("open") } function c(c) { const i = c.target.closest("li[data-history-index]"); if (!i) return; const s = i.dataset.historyIndex, d = HistoryManager.getAll()[s]; d && (display.innerHTML = d.input, salida.innerHTML = d.visualHtml, activadoBotones(d.input), bajarteclado(), a()) } function i() { confirm("¿Seguro que quieres borrar todo el historial?") && HistoryManager.clear() } function s(t) { const { index: r } = t.detail; e.classList.contains("open") || a(); const c = list.querySelector(`li[data-history-index="${r}"]`); c && (c.classList.remove("history-item-highlight"), void c.offsetWidth, c.classList.add("history-item-highlight")) } return { init: function() { e = document.getElementById("history-panel"); t = document.getElementById("history-list"); n = document.getElementById("history-toggle-btn"); o = document.getElementById("clear-history-btn"); n.addEventListener("click", a); o.addEventListener("click", i); t.addEventListener("click", c); window.addEventListener("history:updated", r); window.addEventListener("history:duplicate", s); r() } } })();
+
+
+
+
+
+
+
+
+
+
+// =======================================================
+// --- REEMPLAZO: FUNCIÓN SIMPLIFICADA PARA RAÍZ CUADRADA ---
+// =======================================================
+function raizCuadrada() {
+    salida.innerHTML = "";
+    const numeroStr = display.innerHTML;
+    const numero = parseInt(numeroStr, 10);
+
+    // --- Validaciones ---
+    if (isNaN(numero) || numeroStr.includes(',')) {
+        salida.innerHTML = "<p class='error'>La raíz cuadrada solo funciona con números enteros.</p>";
+        bajarteclado();
+        return;
+    }
+    if (numero < 0) {
+        salida.innerHTML = errorMessages.raiz2; // Ya tienes este mensaje
+        bajarteclado();
+        return;
+    }
+    if (numero === 0) {
+        salida.innerHTML = errorMessages.raiz1; // Y este también
+        bajarteclado();
+        return;
+    }
+
+    const raizExacta = Math.sqrt(numero);
+    if (raizExacta % 1 !== 0) {
+        salida.innerHTML = "<p class='error'>Este número no tiene una raíz cuadrada entera exacta.</p>";
+        bajarteclado();
+        return;
+    }
+
+    // --- Visualización del algoritmo ---
+    // Clear previous content
+    salida.innerHTML = ''; 
+    // Set up a container for the visual output using flexbox or grid for alignment
+    const container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column'; // Stack elements vertically
+    container.style.alignItems = 'center'; // Center elements horizontally
+    container.style.fontFamily = 'monospace'; // Use monospace for alignment
+    container.style.fontSize = '2.5em';
+    container.style.color = '#fff';
+    container.style.padding = '10px';
+
+    // Top result (the calculated root)
+    const resultDiv = document.createElement('div');
+    resultDiv.textContent = raizExacta;
+    resultDiv.style.color = '#ffaa00'; // Yellow color for the result
+    container.appendChild(resultDiv);
+
+    // Visual representation of the long division for square root
+    const processDiv = document.createElement('div');
+    processDiv.style.display = 'grid';
+    processDiv.style.gridTemplateColumns = 'auto auto 1fr'; // Root | Square Root Sign | Number
+    processDiv.style.alignItems = 'center'; // Vertically align items
+    processDiv.style.marginTop = '10px';
+
+    // The root (e.g., '9' in your example)
+    const rootNumberSpan = document.createElement('span');
+    rootNumberSpan.textContent = raizExacta;
+    rootNumberSpan.style.color = '#00ff00'; // Green color
+    rootNumberSpan.style.marginRight = '5px';
+    rootNumberSpan.style.gridColumn = '1';
+    rootNumberSpan.style.textAlign = 'right';
+    processDiv.appendChild(rootNumberSpan);
+
+    // The square root symbol
+    const sqrtSymbolSpan = document.createElement('span');
+    sqrtSymbolSpan.innerHTML = '&#8730;'; // Unicode for square root symbol
+    sqrtSymbolSpan.style.color = '#ddd'; // Light gray
+    sqrtSymbolSpan.style.marginRight = '5px';
+    sqrtSymbolSpan.style.gridColumn = '2';
+    processDiv.appendChild(sqrtSymbolSpan);
+
+    // The number under the radical
+    const numberUnderRadicalSpan = document.createElement('span');
+    numberUnderRadicalSpan.textContent = numeroStr;
+    numberUnderRadicalSpan.style.color = '#ffff00'; // Yellow color
+    numberUnderRadicalSpan.style.borderBottom = '2px solid #ddd'; // Underline
+    numberUnderRadicalSpan.style.gridColumn = '3';
+    numberUnderRadicalSpan.style.textAlign = 'left';
+    processDiv.appendChild(numberUnderRadicalSpan);
+    
+    // First subtraction line: -81
+    const subtractLine = document.createElement('div');
+    subtractLine.style.gridColumn = 'span 3'; // Span all columns
+    subtractLine.style.textAlign = 'center';
+    subtractLine.style.marginTop = '10px'; // Space below the top line
+    
+    const subtractValue = document.createElement('span');
+    subtractValue.textContent = '-' + (raizExacta * raizExacta).toString();
+    subtractValue.style.color = '#99aaff'; // Blue-ish color
+    subtractValue.style.textAlign = 'center';
+    subtractValue.style.position = 'relative'; // For fine-tuning position
+    subtractValue.style.left = '10px'; // Adjust this value to align it
+    subtractLine.appendChild(subtractValue);
+    processDiv.appendChild(subtractLine);
+
+    // Horizontal line for the subtraction
+    const horizontalLine = document.createElement('div');
+    horizontalLine.style.gridColumn = 'span 3';
+    horizontalLine.style.borderBottom = '2px solid #ddd';
+    horizontalLine.style.width = '70%'; // Adjust width as needed
+    horizontalLine.style.justifySelf = 'center'; // Center the line
+    processDiv.appendChild(horizontalLine);
+    
+    // Remainder: 0
+    const remainderDiv = document.createElement('div');
+    remainderDiv.style.gridColumn = 'span 3';
+    remainderDiv.style.textAlign = 'center';
+    remainderDiv.style.marginTop = '10px';
+    
+    const remainderValue = document.createElement('span');
+    remainderValue.textContent = '0';
+    remainderValue.style.color = '#00ff00'; // Green color for the remainder
+    remainderValue.style.position = 'relative';
+    remainderValue.style.left = '25px'; // Adjust this value to align it
+    remainderDiv.appendChild(remainderValue);
+    processDiv.appendChild(remainderDiv);
+
+    container.appendChild(processDiv);
+    salida.appendChild(container);
+
+    HistoryManager.add({ input: `√(${numeroStr})`, visualHtml: salida.innerHTML });
+    bajarteclado();
+}
+
