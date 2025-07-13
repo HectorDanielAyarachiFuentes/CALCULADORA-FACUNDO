@@ -672,17 +672,85 @@ function divideExt(numerosAR) {
 
 
 
-// --- FUNCIÓN DE AYUDA PARA CREAR FLECHAS VISUALES ---
+// --- FUNCIÓN DE AYUDA MEJORADA PARA CREAR FLECHAS VISUALES CON SVG ---
 function crearFlechaLlevada(left, top, width, height) {
-    const flecha = document.createElement("div");
-    flecha.className = "carry-arrow";
-    Object.assign(flecha.style, {
-        left: `${left}px`,
-        top: `${top}px`,
-        width: `${width}px`,
-        height: `${height}px`,
+    
+    // --- 1. Crear el contenedor SVG ---
+    // Usamos SVG porque nos permite dibujar formas vectoriales personalizadas.
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
+    // Lo posicionamos de forma absoluta como hacíamos con el div.
+    svg.style.position = 'absolute';
+    svg.style.left = `${left}px`;
+    svg.style.top = `${top}px`;
+    // 'overflow: visible' es importante para que la punta de la flecha no se corte.
+    svg.style.overflow = 'visible';
+
+    // --- 2. Definir la punta de la flecha (un "marcador") ---
+    // Esto crea una plantilla para la punta que podemos añadir al final de nuestra línea.
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    // ID único para la flecha, por si se dibujan varias a la vez.
+    const markerId = "arrowhead-" + Math.random().toString(36).substring(2, 9);
+    marker.setAttribute("id", markerId);
+    marker.setAttribute("viewBox", "0 0 10 10");
+    marker.setAttribute("refX", "8"); // Posición de la punta respecto a la línea
+    marker.setAttribute("refY", "5");
+    marker.setAttribute("markerWidth", "5"); // Tamaño de la punta
+    marker.setAttribute("markerHeight", "5");
+    marker.setAttribute("orient", "auto-start-reverse");
+
+    // La forma de la punta será un triángulo.
+    const markerPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    markerPath.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+    markerPath.setAttribute("fill", "#ff5555");
+    
+    marker.appendChild(markerPath);
+    defs.appendChild(marker);
+    svg.appendChild(defs);
+
+    // --- 3. Crear la línea curva de la flecha ---
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    
+    // Calculamos los puntos para una curva suave (curva de Bézier cuadrática)
+    // que crea una forma de "J" o gancho.
+    const startX = width * 0.9;  // Inicia abajo a la derecha
+    const startY = height;
+    const controlX = width * 0.1; // La curva se "dobla" hacia la izquierda
+    const controlY = height;
+    const endX = width * 0.2;   // Termina arriba a la izquierda
+    const endY = height * 0.15;
+    
+    // El atributo "d" define la forma de la línea.
+    path.setAttribute("d", `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`);
+    
+    // Estilos de la línea
+    path.setAttribute("stroke", "#ff5555");
+    path.setAttribute("stroke-width", "2.5");
+    path.setAttribute("stroke-linecap", "round"); // Extremos redondeados
+    path.setAttribute("fill", "none");
+    path.setAttribute("marker-end", `url(#${markerId})`); // Añadimos la punta al final de la línea.
+
+    svg.appendChild(path);
+    salida.appendChild(svg);
+    
+    // --- 4. Animar el dibujo de la línea ---
+    // Obtenemos la longitud total de la línea que acabamos de crear.
+    const length = path.getTotalLength();
+    
+    // Preparamos la animación: hacemos la línea "invisible" al principio.
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
+    
+    // Definimos una transición suave para que el cambio sea animado.
+    path.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55)'; // Una curva de aceleración con "rebote"
+    
+    // Después de un instante, cambiamos el offset a 0 para que la línea se "dibuje".
+    // Usamos requestAnimationFrame para asegurar que el navegador está listo.
+    requestAnimationFrame(() => {
+        path.style.strokeDashoffset = '0';
     });
-    salida.appendChild(flecha);
 }
 
 
