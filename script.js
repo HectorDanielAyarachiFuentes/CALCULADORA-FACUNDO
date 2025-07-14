@@ -25,6 +25,13 @@ const errorMessages = {
 let w; // Ancho base para cálculos de tamaño
 let divext = false; // Estado para división expandida
 
+// Objeto para almacenar el estado de la última división calculada.
+let lastDivisionState = {
+    operacionInput: '', // Ej. "6325/2"
+    numerosAR: null,    // El array de operandos procesado por 'calcular'
+    tipo: ''            // 'division'
+};
+
 
 // =======================================================
 // --- FUNCIONES DE INICIO Y MANEJO DE LA CALCULADORA ---
@@ -33,14 +40,14 @@ let divext = false; // Estado para división expandida
 function alCargar() {
     document.getElementById("tpan").innerHTML = "Ver<br>Pantalla";
     document.getElementById("trai").innerHTML = `
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        stroke-width="2.5" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" 
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
         style="width: 1.2em; height: 1.2em;">
           <path d="M4 12h2l4 8 4-16h8"></path>
       </svg>
@@ -70,10 +77,19 @@ function alCargar() {
     activadoBotones('0');
     HistoryManager.init();
     HistoryPanel.init();
+
+    // NUEVO: Ocultar los botones de expansión al cargar la página
+    hideDivExpansionButtons();
 }
 
 function escribir(t) {
-    if (t === '/') divext = false;
+    if (t === '/') {
+        divext = false; // Resetear divext al iniciar una nueva división
+    } else if (['+', '-', 'x', 'primos', 'raiz', 'c', 'del', ','].includes(t) || !isNaN(parseInt(t))) {
+        // NUEVO: Si se escribe cualquier otra cosa (no una división), oculta los botones de expansión
+        hideDivExpansionButtons();
+    }
+
 
     if (t === "c") {
         display.innerHTML = "0";
@@ -81,8 +97,10 @@ function escribir(t) {
         display.innerHTML = display.innerHTML.slice(0, -1) || "0";
     } else if (t === "primos") {
         desFacPri();
+        return;
     } else if (t === "raiz") {
         raizCuadrada();
+        return;
     } else {
         if (display.innerHTML === "0" && t !== ",") {
             display.innerHTML = t;
@@ -110,60 +128,147 @@ function activadoBotones(contDisplay) {
     const tieneOperadorGeneral = /[\+\-x/]/.test(contDisplay);
     const puedeAnadirOperador = !esSoloCero && !tieneOperadorGeneral && !tieneComaAlFinal;
 
-    ['tmas', 'tmen', 'tpor', 'tdiv', 'trai'].forEach(id => {
+    ['tmas', 'tmen', 'tpor', 'tdiv'].forEach(id => {
         document.getElementById(id).disabled = !puedeAnadirOperador || demasiadosCaracteres;
     });
+
+    const esNumeroSolo = /^\d+$/.test(contDisplay) && !esSoloCero && !tieneOperadorGeneral; // Solo un número y no hay operadores
+    document.getElementById("tpri").disabled = !esNumeroSolo;
+    document.getElementById("trai").disabled = !esNumeroSolo;
+
 
     const puedeAnadirComa = !ultimoNumero.includes(',') && !tieneOperadorAlFinal && !deshabilitarNumeros;
     document.getElementById("tcom").disabled = !puedeAnadirComa;
 
     const esCalculable = tieneOperadorGeneral && !tieneOperadorAlFinal && !tieneComaAlFinal;
     document.getElementById("tcal").disabled = !esCalculable;
+}
 
-    const esFactorizable = !tieneOperadorGeneral && /^\d+$/.test(contDisplay) && !esSoloCero && contDisplay.length <= 8;
-    document.getElementById("tpri").disabled = !esFactorizable;
+// NUEVO: Funciones auxiliares para controlar la visibilidad de los botones de expansión
+function showDivExpansionButtons() {
+    botExp.style.display = divext ? "none" : "inline-block";
+    botNor.style.display = divext ? "inline-block" : "none";
+}
+
+function hideDivExpansionButtons() {
+    botExp.style.display = "none";
+    botNor.style.display = "none";
 }
 
 // --- NAVEGACIÓN Y LÓGICA DE LA INTERFAZ ---
 function bajarteclado() { teclado.style.top = "100%"; salida.style.top = "0%"; divVolver.style.top = "0%"; }
 function subirteclado() { teclado.style.top = "0%"; salida.style.top = "-100%"; divVolver.style.top = "-100%"; }
-function divideExpandida(esExpandida) { divext = esExpandida; botExp.style.display = esExpandida ? "none" : "inline-block"; botNor.style.display = esExpandida ? "inline-block" : "none"; calcular(); }
+
+function divideExpandida(esExpandida) {
+    divext = esExpandida;
+
+    showDivExpansionButtons(); // Asegura que se muestren con el estado correcto
+
+    if (!lastDivisionState.numerosAR || lastDivisionState.tipo !== 'division') {
+        console.warn("No hay una división previa para expandir/normalizar. Realiza una división primero.");
+        salida.innerHTML = "<p class='error'>Primero realiza una división para usar esta función.</p>";
+        bajarteclado();
+        return;
+    }
+
+    if (divext) {
+        divideExt(lastDivisionState.numerosAR);
+    } else {
+        divide(lastDivisionState.numerosAR);
+    }
+    bajarteclado();
+}
 
 
 // ======================================
 // --- FUNCIONES DE CÁLCULO VISUAL ---
 // ======================================
+
 function calcular() {
     const entrada = display.innerHTML;
     const operadorMatch = entrada.match(/[\+\-x/]/);
-    if (!operadorMatch) return;
+
+    if (!operadorMatch) {
+        salida.innerHTML = "<p class='error'>Operación inválida.</p>";
+        bajarteclado();
+        hideDivExpansionButtons(); // Ocultar si no es una operación válida
+        return;
+    }
 
     const operador = operadorMatch[0];
     const numAr = entrada.split(operador);
 
     const numerosAR = numAr.map(numStr => {
         let limpio = numStr.replace(/^0+(?!\b|,)/, '');
+        if (limpio === '') limpio = '0';
         if (limpio.startsWith(',')) limpio = '0' + limpio;
         const p = limpio.indexOf(",") + 1;
         const d = p > 0 ? limpio.length - p : 0;
         const v = limpio.replace(",", "");
         return [v || "0", d];
     });
-    
-    // La limpieza principal se hace aquí, pero la hemos reforzado en cada sub-función.
+
     salida.innerHTML = "";
+
+    let operacionGuardadaEnHistorial = false;
+
     switch (operador) {
-        case "+": suma(numerosAR); break;
-        case "-": resta(numerosAR); break;
-        case "x": multiplica(numerosAR); break;
-        case "/": divext ? divideExt(numerosAR) : divide(numerosAR); break;
+        case "+":
+            suma(numerosAR);
+            operacionGuardadaEnHistorial = true;
+            hideDivExpansionButtons(); // No es una división
+            break;
+        case "-":
+            resta(numerosAR);
+            operacionGuardadaEnHistorial = true;
+            hideDivExpansionButtons(); // No es una división
+            break;
+        case "x":
+            multiplica(numerosAR);
+            operacionGuardadaEnHistorial = true;
+            hideDivExpansionButtons(); // No es una división
+            break;
+        case "/":
+            lastDivisionState.operacionInput = entrada;
+            lastDivisionState.numerosAR = numerosAR;
+            lastDivisionState.tipo = 'division';
+            lastDivisionState.isExpanded = divext;
+
+            if (divext) {
+                divideExt(numerosAR);
+            } else {
+                divide(numerosAR);
+            }
+
+            if (!salida.innerHTML.includes("<p class='error'>")) {
+                operacionGuardadaEnHistorial = true;
+                showDivExpansionButtons(); // Mostrar los botones si es una división exitosa
+            } else {
+                hideDivExpansionButtons(); // Ocultar si hay un error en la división
+            }
+            break;
     }
 
-    if (!salida.innerHTML.includes("<p class='error'>")) {
+    if (operacionGuardadaEnHistorial) {
         HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML });
     }
+
     bajarteclado();
+    activadoBotones(display.innerHTML); // Volver a evaluar el estado de los botones
 }
+
+function formatResultForDisplay(htmlContent) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const resultCells = tempDiv.querySelectorAll('.caja4');
+    if (resultCells.length > 0) {
+        return Array.from(resultCells).map(cell => cell.textContent).join('').replace(/\s/g, '');
+    } else {
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        return textContent.replace(/[\n\r\t]/g, '').trim();
+    }
+}
+
 
 function crearCelda(clase, texto, estilos) {
     const celda = document.createElement("div");
@@ -215,11 +320,11 @@ function crearFlechaLlevada(left, top, width, height) {
 }
 
 function suma(numerosAR) {
-    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla para evitar datos fantasma.
+    salida.innerHTML = "";
     let maxDecimales = 0;
     numerosAR.forEach(n => maxDecimales = Math.max(maxDecimales, n[1]));
     let operandos = numerosAR.map(n => n[0].padEnd(n[0].length + maxDecimales - n[1], '0'));
-    
+
     let longitudMaxOperandos = Math.max(...operandos.map(n => n.length));
     let operandosCalculo = operandos.map(n => n.padStart(longitudMaxOperandos, '0'));
     let total = 0n;
@@ -272,7 +377,7 @@ function suma(numerosAR) {
             });
         }
     });
-    
+
     let yResultado = (yOffsetBase + operandos.length) * tamCelda;
     for (let i = 0; i < resultado.length; i++) {
         crearCelda("caja4", resultado[i], {
@@ -285,7 +390,7 @@ function suma(numerosAR) {
 }
 
 function resta(numerosAR) {
-    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
+    salida.innerHTML = "";
     let m = Math.max(numerosAR[0][1], numerosAR[1][1]);
     let n1 = numerosAR[0][0].padEnd(numerosAR[0][0].length + m - numerosAR[0][1], '0');
     let n2 = numerosAR[1][0].padEnd(numerosAR[1][0].length + m - numerosAR[1][1], '0');
@@ -311,7 +416,7 @@ function resta(numerosAR) {
 }
 
 function multiplica(numerosAR) {
-    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
+    salida.innerHTML = "";
     const num1 = numerosAR[0][0];
     const num2 = numerosAR[1][0];
     const numDec1 = numerosAR[0][1];
@@ -381,10 +486,12 @@ function multiplica(numerosAR) {
 }
 
 function divide(numerosAR) {
-    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
-    botExp.style.display = "inline-block";
-    botNor.style.display = "none";
-    // ... el resto de la función sigue igual
+    salida.innerHTML = "";
+    // Se asegura que los botones estén en el estado "normal" (DIV EXPAND. visible)
+    // Esto lo maneja showDivExpansionButtons() en calcular() y divideExpandida().
+    // botExp.style.display = "inline-block"; // Ya no se controla aquí directamente
+    // botNor.style.display = "none";
+
     let num1Str = numerosAR[0][0], num2Str = numerosAR[1][0];
     let numDec1 = numerosAR[0][1], numDec2 = numerosAR[1][1];
 
@@ -476,10 +583,12 @@ function divide(numerosAR) {
 }
 
 function divideExt(numerosAR) {
-    salida.innerHTML = ""; // CORRECCIÓN: Limpieza de pantalla.
-    botExp.style.display = "none";
-    botNor.style.display = "inline-block";
-    // ... el resto de la función sigue igual
+    salida.innerHTML = "";
+    // Se asegura que los botones estén en el estado "expandido" (DIV NORMAL visible)
+    // Esto lo maneja showDivExpansionButtons() en calcular() y divideExpandida().
+    // botExp.style.display = "none"; // Ya no se controla aquí directamente
+    // botNor.style.display = "inline-block";
+
     let num1Str = numerosAR[0][0], num2Str = numerosAR[1][0];
     let numDec1 = numerosAR[0][1], numDec2 = numerosAR[1][1];
 
@@ -513,7 +622,7 @@ function divideExt(numerosAR) {
         dividendoParcialStr += num1Str[i];
         let cocienteParcialStr = (BigInt(dividendoParcialStr) / BigInt(num2Str)).toString();
 
-        if (BigInt(cocienteParcialStr) > 0) {
+        if (BigInt(cocienteParcialStr) > 0 || (cocienteParcialStr === '0' && i > 0)) {
             let aRestar = (BigInt(cocienteParcialStr) * BigInt(num2Str)).toString();
             restas.push(aRestar);
             posUltCif.push(i + 1);
@@ -588,6 +697,7 @@ function desFacPri() {
     if (isNaN(numIzda) || numIzda === 0) {
         salida.innerHTML = errorMessages.dFactorial1;
         bajarteclado();
+        hideDivExpansionButtons(); // Ocultar si no es una operación de división
         return;
     }
     let numIzdaArray = [numIzda], numDchaArray = [], i = 2, tempNum = numIzda;
@@ -628,6 +738,7 @@ function desFacPri() {
     });
     HistoryManager.add({ input: entrada, visualHtml: salida.innerHTML });
     bajarteclado();
+    hideDivExpansionButtons(); // Ocultar si no es una operación de división
 }
 
 // ===================================================================
@@ -682,7 +793,6 @@ const HistoryManager = (function() {
     };
 })();
 
-// CORRECCIÓN: HistoryPanel ahora es más inteligente para extraer el resultado.
 const HistoryPanel = (function() {
     let panelElement, listElement, toggleButton, clearButton;
 
@@ -701,21 +811,17 @@ const HistoryPanel = (function() {
 
             const tempDiv = document.createElement("div");
             tempDiv.innerHTML = entry.visualHtml;
-            
-            // --- INICIO DE LA CORRECCIÓN INTELIGENTE ---
+
             const resultCells = tempDiv.querySelectorAll('.caja4');
             let resultText;
 
             if (resultCells.length > 0) {
-                // Si encontramos celdas de resultado (.caja4), construimos el resultado solo con su texto.
                 resultText = Array.from(resultCells).map(cell => cell.textContent).join('').trim();
             } else {
-                // Si no (para raíz cuadrada o errores), usamos el método anterior.
                 resultText = tempDiv.textContent.trim();
             }
-            
-            resultText = resultText || "?"; // Fallback final.
-            // --- FIN DE LA CORRECCIÓN INTELIGENTE ---
+
+            resultText = resultText || "?";
 
             listItem.innerHTML = `<span class="history-input">${entry.input}</span><span class="history-result-preview">= ${resultText}</span>`;
             listElement.appendChild(listItem);
@@ -732,6 +838,38 @@ const HistoryPanel = (function() {
         if (historyEntry) {
             display.innerHTML = historyEntry.input;
             salida.innerHTML = historyEntry.visualHtml;
+
+            // NUEVO: Al cargar del historial, se evalúa si es una división
+            const esDivision = historyEntry.input.includes('/');
+            if (esDivision) {
+                const numAr = historyEntry.input.split('/');
+                const numerosAR = numAr.map(numStr => {
+                    let limpio = numStr.replace(/^0+(?!\b|,)/, '');
+                    if (limpio === '') limpio = '0';
+                    if (limpio.startsWith(',')) limpio = '0' + limpio;
+                    const p = limpio.indexOf(",") + 1;
+                    const d = p > 0 ? limpio.length - p : 0;
+                    const v = limpio.replace(",", "");
+                    return [v || "0", d];
+                });
+                lastDivisionState.operacionInput = historyEntry.input;
+                lastDivisionState.numerosAR = numerosAR;
+                lastDivisionState.tipo = 'division';
+
+                // Determinar el estado de 'divext' para la visualización del historial
+                // Por defecto, mostrará la división normal al cargar del historial,
+                // a menos que quieras guardar el estado de expansión en el historial también.
+                divext = false; // Asumimos visualización normal al cargar del historial
+                showDivExpansionButtons(); // Mostrar los botones de expansión
+                divide(lastDivisionState.numerosAR); // Redibujar la división en modo normal
+            } else {
+                // Si no es una división, ocultar los botones de expansión
+                lastDivisionState.operacionInput = '';
+                lastDivisionState.numerosAR = null;
+                lastDivisionState.tipo = '';
+                hideDivExpansionButtons();
+            }
+
             activadoBotones(historyEntry.input);
             bajarteclado();
             togglePanel();
@@ -741,6 +879,7 @@ const HistoryPanel = (function() {
     function handleClearClick() {
         if (confirm("¿Seguro que quieres borrar todo el historial?")) {
             HistoryManager.clear();
+            hideDivExpansionButtons(); // Ocultar si se borra el historial y no hay más divisiones
         }
     }
 
@@ -781,21 +920,31 @@ function raizCuadrada() {
     const entrada = display.innerHTML;
     const numero = parseInt(entrada, 10);
 
+    if (entrada.includes('+') || entrada.includes('-') || entrada.includes('x') || entrada.includes('/')) {
+        salida.innerHTML = "<p class='error'>Esta función solo acepta un número simple.</p>";
+        bajarteclado();
+        hideDivExpansionButtons();
+        return;
+    }
+
     if (isNaN(numero) || entrada.includes(',')) {
         salida.innerHTML = "<p class='error'>La raíz cuadrada solo funciona con números enteros.</p>";
         bajarteclado();
+        hideDivExpansionButtons();
         return;
     }
     if (numero === 0) {
         salida.innerHTML = errorMessages.raiz1;
         HistoryManager.add({ input: `√(${entrada})`, visualHtml: salida.innerHTML });
         bajarteclado();
+        hideDivExpansionButtons();
         return;
     }
      if (numero < 0) {
         salida.innerHTML = "<p class='error'>No se puede calcular la raíz de un número negativo.</p>";
         bajarteclado();
-        return; 
+        hideDivExpansionButtons();
+        return;
     }
 
     const resultado = Math.sqrt(numero);
@@ -803,6 +952,7 @@ function raizCuadrada() {
     if (resultado % 1 !== 0) {
         salida.innerHTML = "<p class='error'>Este número no tiene una raíz cuadrada entera exacta.</p>";
         bajarteclado();
+        hideDivExpansionButtons();
         return;
     }
 
@@ -815,4 +965,5 @@ function raizCuadrada() {
     });
 
     bajarteclado();
+    hideDivExpansionButtons(); // Ocultar después de calcular la raíz
 }
