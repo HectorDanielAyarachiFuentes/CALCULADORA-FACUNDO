@@ -956,7 +956,7 @@ function raizCuadrada() {
         return;
     }
 
-    const htmlResultado = `<p>${resultado}</p>`;
+    const htmlResultado = `<p class="caja4">${resultado}</p>`;
     salida.innerHTML = htmlResultado;
 
     HistoryManager.add({
