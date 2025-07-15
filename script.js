@@ -967,3 +967,44 @@ function raizCuadrada() {
     bajarteclado();
     hideDivExpansionButtons(); // Ocultar después de calcular la raíz
 }
+
+// Velocidad de title y cambio al pasar de pestaña
+
+let baseTitle = "Calculadora Facundo 🧮";
+let altTitle = "¡Regresa! 😢 🧮 ";
+let scrollTitle = altTitle + " ";
+let interval;
+let pos = 0;
+let timeout;
+
+function startTitleAnimation() {
+  clearInterval(interval);
+  clearTimeout(timeout);
+  pos = 0;
+
+  interval = setInterval(() => {
+    document.title = scrollTitle.substring(pos) + scrollTitle.substring(0, pos);
+    pos = (pos + 1) % scrollTitle.length;
+  }, 40); // 💨 Rápido
+}
+
+function stopTitleAnimation() {
+  clearInterval(interval);
+  clearTimeout(timeout);
+
+  // Paso 1: mostrar mensaje de bienvenida
+  document.title = "Gracias por volver 😊";
+
+  // Paso 2: después de 2 segundos, volver al título base
+  timeout = setTimeout(() => {
+    document.title = baseTitle;
+  }, 2000);
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    startTitleAnimation();
+  } else {
+    stopTitleAnimation();
+  }
+});
