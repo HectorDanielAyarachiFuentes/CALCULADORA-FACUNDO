@@ -1,4 +1,4 @@
-# 💥 CALCULADORA-FACUNDO 💥
+# 💥 CALCULADORA-FACUNDO V-1 💥
 
 *No es solo una calculadora. Es el pináculo de la aritmética digital. Es el legado de Facundo Killer.*
 
