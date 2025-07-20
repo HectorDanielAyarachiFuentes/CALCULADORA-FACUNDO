@@ -1,22 +1,7 @@
 /* --- Fuentes Personalizadas --- */
-@font-face {
-    font-family: 'jellyregular';
-    src: url('jelly-webfont.woff2') format('woff2'), url('jelly-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'kurzetstypekurzetstype';
-    src: url('kurzetstype_v1.4-webfont.woff2') format('woff2'), url('kurzetstype_v1.4-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'arrow_7regular';
-    src: url('arrow_7-webfont.woff2') format('woff2'), url('arrow_7-webfont.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
+/* Importa las fuentes Fredoka One y Pixelify Sans */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Pixelify+Sans:wght@400..700&display=swap');
+
 
 /* --- Variables Globales de Color --- */
 :root {
@@ -85,7 +70,7 @@ header {
     text-align: center;
 }
 header h1 {
-    font-family: "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
+    font-family: 'Pixelify Sans', "Arial Black", "Helvetica Neue", Helvetica, sans-serif;
     font-size: 1.5rem; font-weight: bold; line-height: 1; letter-spacing: 2px; color: var(--color-title-1);
     text-transform: uppercase; text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -96,6 +81,7 @@ header .subtitle a:hover { color: var(--color-title-2); }
 
 /* --- Display y Contenedor del Teclado --- */
 #display {
+    font-family: 'Fredoka One', cursive, monospace;
     background-color: var(--bg-display); color: var(--color-display-text); text-align: right; width: 100%;
     padding: 20px; font-size: 2.2rem; overflow: hidden; border-radius: 10px; margin-bottom: 15px;
     min-height: 65px; word-wrap: break-word;
@@ -112,7 +98,7 @@ header .subtitle a:hover { color: var(--color-title-2); }
 }
 #teclado button {
     font-size: 1.4rem; color: var(--btn-text-color); cursor: pointer; display: flex; justify-content: center;
-    align-items: center; padding: 0; border: 2px solid #000; font-family: 'jellyregular'; transition: transform 0.1s ease;
+    align-items: center; padding: 0; border: 2px solid #000; transition: transform 0.1s ease;
 }
 @keyframes arcoiris {
     0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
@@ -126,12 +112,12 @@ header .subtitle a:hover { color: var(--color-title-2); }
 #teclado button:disabled { background-color: var(--btn-disabled-bg) !important; color: var(--btn-disabled-text); cursor: not-allowed; }
 
 /* Colores y tamaños específicos de botones */
-#tpan { grid-column: span 2; background-color: var(--btn-special-bg); font-size: 0.8em; }
-#tcal { grid-column: span 3; background-color: var(--btn-equal-bg); }
+#tpan { grid-column: span 2; background-color: var(--btn-special-bg); font-size: 0.8em; font-family: 'jellyregular'; }
+#tcal { grid-column: span 3; background-color: var(--btn-equal-bg); font-family: 'jellyregular'; }
 #t0 { grid-column: span 2; }
-#t1, #t2, #t3, #t4, #t5, #t6, #t7, #t8, #t9, #t0, #tcom { background-color: var(--btn-num-bg); }
-#tmas, #tmen, #tpor, #tdiv, #tc, #tdel { background-color: var(--btn-op-bg); }
-#tpri, #trai { background-color: var(--btn-equal-bg); }
+#t1, #t2, #t3, #t4, #t5, #t6, #t7, #t8, #t9, #t0, #tcom { background-color: var(--btn-num-bg); font-family: 'Fredoka One', cursive; }
+#tmas, #tmen, #tpor, #tdiv, #tc, #tdel { background-color: var(--btn-op-bg); font-family: 'jellyregular'; }
+#tpri, #trai { background-color: var(--btn-equal-bg); font-family: 'jellyregular'; }
 
 /* --- Pantalla de Salida (Algoritmos) --- */
 #salida {
@@ -150,7 +136,9 @@ header .subtitle a:hover { color: var(--color-title-2); }
 #volver:hover, #botexp:hover, #botnor:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
 #volver { font-family: 'arrow_7regular'; font-size: 1.5rem; }
 #botexp, #botnor { font-family: 'jellyregular'; display: none; }
-.caja, .caja2, .caja3, .caja4 { position: absolute; text-align: center; font-family: 'kurzetstypekurzetstype'; }
+
+/* CAMBIO: Aplicamos Fredoka One a las cajas de salida para que los números se vean como los de la calculadora */
+.caja, .caja2, .caja3, .caja4 { position: absolute; text-align: center; font-family: 'Fredoka One', cursive; }
 .caja  { color: var(--output-caja-1); }
 .caja2 { color: var(--output-caja-2); }
 .caja3 { color: var(--output-caja-3); }
@@ -195,7 +183,7 @@ header .subtitle a:hover { color: var(--color-title-2); }
     transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 #history-panel.open { right: 0; }
 .history-header {
@@ -217,8 +205,15 @@ header .subtitle a:hover { color: var(--color-title-2); }
 #history-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
 #history-list li { padding: 15px 20px; border-bottom: 1px solid #333; cursor: pointer; transition: background-color 0.2s; }
 #history-list li:hover { background-color: #2c3e50; }
-#history-list li .history-input { display: block; font-size: 1.1em; color: #ecf0f1; margin-bottom: 5px; font-family: monospace; word-wrap: break-word; }
-#history-list li .history-result-preview { display: block; font-size: 1.3em; color: #2ecc71; font-weight: bold; text-align: right; font-family: monospace; }
+#history-list li .history-input {
+    display: block; font-size: 1.1em; color: #ecf0f1; margin-bottom: 5px;
+    font-family: 'Fredoka One', cursive, monospace;
+    word-wrap: break-word;
+}
+#history-list li .history-result-preview {
+    display: block; font-size: 1.3em; color: #2ecc71; font-weight: bold; text-align: right;
+    font-family: 'Fredoka One', cursive, monospace;
+}
 
 
 /* ============================================== */
@@ -237,7 +232,8 @@ header .subtitle a:hover { color: var(--color-title-2); }
     #botexp, #botnor { font-size: 3.5vw !important; padding: 8px; }
     .error { font-size: 4.5vw !important; padding-top: 25%; }
     #salida { font-size: 5vw !important; }
-    .caja, .caja2, .caja3, .caja4 { font-size: inherit !important; }
+    /* Ajustamos el tamaño para Fredoka One en responsive */
+    .caja, .caja2, .caja3, .caja4 { font-size: 8vw !important; } /* Un poco más grande para mayor visibilidad */
 }
 
 @media (max-width: 400px) {
@@ -250,6 +246,8 @@ header .subtitle a:hover { color: var(--color-title-2); }
     #volver { font-size: 6vw !important; }
     #botexp, #botnor { font-size: 3.2vw !important; padding: 7px; }
     .error { font-size: 4vw !important; }
+    /* Ajustamos el tamaño para Fredoka One en responsive */
+    .caja, .caja2, .caja3, .caja4 { font-size: 7vw !important; } /* Ajuste fino para móviles más pequeños */
 }
 
 
